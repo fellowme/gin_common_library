@@ -1,4 +1,4 @@
-package msyql
+package mysql
 
 import (
 	"fmt"
