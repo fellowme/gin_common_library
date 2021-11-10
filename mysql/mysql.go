@@ -26,6 +26,13 @@ func InitMysqlMap() {
 	}
 }
 
+func GetMysqlMap() map[string]*gorm.DB {
+	if len(mysqlMap) == 0 {
+		InitMysqlMap()
+	}
+	return mysqlMap
+}
+
 func UseMysql(name ...string) *gorm.DB {
 	if len(mysqlMap) == 0 {
 		// MySQL 没有初始化  直接初始化
@@ -37,7 +44,7 @@ func UseMysql(name ...string) *gorm.DB {
 	}
 	mysql, ok := mysqlMap[mysqlName]
 	if !ok {
-		zap.L().Error("UseMysql fail 未获取到相应的链接", zap.Any("name", name))
+		zap.L().Error("UseMysql fail not find right connect", zap.Any("name", name))
 		return nil
 	}
 	return mysql
