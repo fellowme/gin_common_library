@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	gin_logger "github.com/fellowme/gin_commom_library/logger"
+	gin_logger "github.com/fellowme/gin_common_library/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"io/ioutil"

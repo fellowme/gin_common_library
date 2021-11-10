@@ -3,9 +3,9 @@ package token
 import (
 	"encoding/json"
 	"errors"
-	gin_config "github.com/fellowme/gin_commom_library/config"
-	gin_const "github.com/fellowme/gin_commom_library/const"
-	gin_remote_service "github.com/fellowme/gin_commom_library/remote_service"
+	gin_config "github.com/fellowme/gin_common_library/config"
+	gin_const "github.com/fellowme/gin_common_library/const"
+	gin_remote_service "github.com/fellowme/gin_common_library/remote_service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/url"

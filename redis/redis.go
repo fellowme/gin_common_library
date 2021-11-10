@@ -2,7 +2,7 @@ package redis
 
 import (
 	"fmt"
-	gin_config "github.com/fellowme/gin_commom_library/config"
+	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/gomodule/redigo/redis"
 	"go.uber.org/zap"
 	"time"

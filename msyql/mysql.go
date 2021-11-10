@@ -2,7 +2,7 @@ package msyql
 
 import (
 	"fmt"
-	gin_config "github.com/fellowme/gin_commom_library/config"
+	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"go.uber.org/zap"

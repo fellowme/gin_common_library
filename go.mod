@@ -1,4 +1,4 @@
-module github.com/fellowme/gin_commom_library
+module github.com/fellowme/gin_common_library
 
 go 1.15
 

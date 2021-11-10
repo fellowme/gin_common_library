@@ -3,7 +3,7 @@ package jaeger
 import (
 	"bytes"
 	"fmt"
-	gin_config "github.com/fellowme/gin_commom_library/config"
+	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"

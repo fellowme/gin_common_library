@@ -1,8 +1,8 @@
 package logger
 
 import (
-	gin_config "github.com/fellowme/gin_commom_library/config"
-	gin_util "github.com/fellowme/gin_commom_library/util"
+	gin_config "github.com/fellowme/gin_common_library/config"
+	gin_util "github.com/fellowme/gin_common_library/util"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

@@ -1,7 +1,7 @@
 package logger
 
 import (
-	gin_config "github.com/fellowme/gin_commom_library/config"
+	gin_config "github.com/fellowme/gin_common_library/config"
 	"go.uber.org/zap"
 )
 

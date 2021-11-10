@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	gin_const "github.com/fellowme/gin_commom_library/const"
-	gin_token "github.com/fellowme/gin_commom_library/token"
+	gin_const "github.com/fellowme/gin_common_library/const"
+	gin_token "github.com/fellowme/gin_common_library/token"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

@@ -6,7 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	gin_config "github.com/fellowme/gin_commom_library/config"
+	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/pkg/errors"

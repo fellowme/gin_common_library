@@ -2,8 +2,8 @@ package redis
 
 import (
 	"errors"
-	gin_config "github.com/fellowme/gin_commom_library/config"
-	gin_util "github.com/fellowme/gin_commom_library/util"
+	gin_config "github.com/fellowme/gin_common_library/config"
+	gin_util "github.com/fellowme/gin_common_library/util"
 	"github.com/gomodule/redigo/redis"
 	"go.uber.org/zap"
 	"strings"

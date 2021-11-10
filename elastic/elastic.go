@@ -3,7 +3,7 @@ package elastic
 import (
 	"context"
 	"fmt"
-	gin_config "github.com/fellowme/gin_commom_library/config"
+	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 )
