@@ -33,12 +33,15 @@ func GetMysqlMap() map[string]*gorm.DB {
 	return mysqlMap
 }
 
-func UseMysql(name ...string) *gorm.DB {
+func UseMysql(target map[string]*gorm.DB, name ...string) *gorm.DB {
+	if target == nil {
+		target = mysqlMap
+	}
 	mysqlName := mysqlNameDefault
 	if len(name) != 0 {
 		mysqlName = name[0]
 	}
-	mysql, ok := mysqlMap[mysqlName]
+	mysql, ok := target[mysqlName]
 	if !ok {
 		zap.L().Error("UseMysql fail not find right connect", zap.Any("name", name))
 		return nil
