@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/gin-gonic/gin"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -61,4 +63,32 @@ func Md5(data []byte) string {
 	hash.Write(data)
 	return hex.EncodeToString(hash.Sum(nil))
 
+}
+
+func ReflectValueByType(value string, valueType string) interface{} {
+	switch valueType {
+	case "int":
+		result, _ := strconv.Atoi(value)
+		return result
+	case "bool":
+		result, _ := strconv.ParseBool(value)
+		return result
+	case "float64":
+		result, _ := strconv.ParseFloat(value, 64)
+		return result
+	case "float32":
+		result, _ := strconv.ParseFloat(value, 32)
+		return result
+	}
+
+	return value
+}
+
+func GetPath() string {
+	path, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+
+	return path
 }

@@ -9,8 +9,8 @@ import (
 
 type BaseMysqlStruct struct {
 	Id         int       `json:"id" gorm:"primary_key;AUTO_INCREMENT;comment:'主键'"`
-	CreateTime LocalTime `json:"create_time" gorm:"NOT NULL;comment:'创建时间'"`
-	UpdateTime LocalTime `json:"update_time" gorm:"NOT NULL;comment:'更新时间'"`
+	CreateTime LocalTime `json:"create_time" gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP;comment:'创建时间'"`
+	UpdateTime LocalTime `json:"update_time" gorm:"NULL; DEFAULT:NULL ON UPDATE CURRENT_TIMESTAMP;comment:'更新时间'"`
 	IsDelete   bool      `json:"is_delete" gorm:"DEFAULT:'0';comment:'是否删除 0 未删除 1删除'"`
 }
 

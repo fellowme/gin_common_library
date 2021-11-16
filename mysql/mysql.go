@@ -34,10 +34,6 @@ func GetMysqlMap() map[string]*gorm.DB {
 }
 
 func UseMysql(name ...string) *gorm.DB {
-	if len(mysqlMap) == 0 {
-		// MySQL 没有初始化  直接初始化
-		InitMysqlMap()
-	}
 	mysqlName := mysqlNameDefault
 	if len(name) != 0 {
 		mysqlName = name[0]
@@ -64,8 +60,8 @@ func initMysql(mysqlConfig gin_config.MysqlConf) *gorm.DB {
 	db.DB().SetConnMaxLifetime(mysqlConfig.ConnMaxLifetime * time.Second)
 	db.DB().SetMaxIdleConns(mysqlConfig.MaxIdleConnects)
 	db.DB().SetMaxOpenConns(mysqlConfig.MaxOpenConnects)
-	db.Callback().Create().Before("gorm:create").Register("update_created_time", updateTimeStampForCreateCallback)
-	db.Callback().Create().Before("gorm:update").Register("update_time", updateTimeStampForUpdateCallback)
+	//db.Callback().Create().Before("gorm:create").Register("update_created_time", updateTimeStampForCreateCallback)
+	//db.Callback().Create().Before("gorm:update").Register("update_time", updateTimeStampForUpdateCallback)
 	return db
 }
 
@@ -79,35 +75,35 @@ func CloseMysqlPool() {
 	}
 }
 
-// updateTimeStampForCreateCallback 注册新建钩子在持久化之前  *******创建之前******//
-func updateTimeStampForCreateCallback(scope *gorm.Scope) {
-	if !scope.HasError() {
-		if createTimeField, ok := scope.FieldByName("create_time"); ok {
-			if createTimeField.IsBlank {
-				if err := createTimeField.Set(time.Now()); err != nil {
-					zap.L().Error("updateTimeStampForCreateCallback  createTimeField error", zap.Any("error", err))
-				}
-			}
-		}
-		if modifyTimeField, ok := scope.FieldByName("update_time"); ok {
-			if modifyTimeField.IsBlank {
-				if err := modifyTimeField.Set(time.Now()); err != nil {
-					zap.L().Error("updateTimeStampForCreateCallback  modifyTimeField error", zap.Any("error", err))
-				}
-			}
-		}
-	}
-}
-
-// updateTimeStampForUpdateCallback 注册新建钩子在持久化之前  *******更新之前******//
-func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
-	if !scope.HasError() {
-		if modifyTimeField, ok := scope.FieldByName("update_time"); ok {
-			if modifyTimeField.IsBlank {
-				if err := modifyTimeField.Set(time.Now()); err != nil {
-					zap.L().Error("updateTimeStampForCreateCallback  modifyTimeField error", zap.Any("error", err))
-				}
-			}
-		}
-	}
-}
+//// updateTimeStampForCreateCallback 注册新建钩子在持久化之前  *******创建之前******//
+//func updateTimeStampForCreateCallback(scope *gorm.Scope) {
+//	if !scope.HasError() {
+//		if createTimeField, ok := scope.FieldByName("create_time"); ok {
+//			if createTimeField.IsBlank {
+//				if err := createTimeField.Set(time.Now()); err != nil {
+//					zap.L().Error("updateTimeStampForCreateCallback  createTimeField error", zap.Any("error", err))
+//				}
+//			}
+//		}
+//		if modifyTimeField, ok := scope.FieldByName("update_time"); ok {
+//			if modifyTimeField.IsBlank {
+//				if err := modifyTimeField.Set(time.Now()); err != nil {
+//					zap.L().Error("updateTimeStampForCreateCallback  modifyTimeField error", zap.Any("error", err))
+//				}
+//			}
+//		}
+//	}
+//}
+//
+//// updateTimeStampForUpdateCallback 注册新建钩子在持久化之前  *******更新之前******//
+//func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
+//	if !scope.HasError() {
+//		if modifyTimeField, ok := scope.FieldByName("update_time"); ok {
+//			if modifyTimeField.IsBlank {
+//				if err := modifyTimeField.Set(time.Now()); err != nil {
+//					zap.L().Error("updateTimeStampForCreateCallback  modifyTimeField error", zap.Any("error", err))
+//				}
+//			}
+//		}
+//	}
+//}
