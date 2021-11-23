@@ -6,8 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"os"
 	"strconv"
-	"strings"
-	"time"
 )
 
 const (
@@ -37,22 +35,6 @@ func ReturnResponse(httpCode, errCode int, message interface{}, data interface{}
 		"mapi_query_time": NowTimeToString(),
 		"version":         version,
 	})
-}
-
-//NowTimeToString *******现在日期格式化 yyyy-MM-dd HH:mm:ss*******//
-func NowTimeToString() string {
-	return time.Now().Format("2006-01-02 15:04:05")
-}
-
-//RemoveSliceEmpty *******删除slice里面的空格和去除字符的前后的空格*******//
-func RemoveSliceEmpty(arg []string) []string {
-	var keys []string
-	for _, key := range arg {
-		if key != "" || strings.Trim(key, " ") != "" {
-			keys = append(keys, key)
-		}
-	}
-	return keys
 }
 
 func Md5(data []byte) string {

@@ -13,6 +13,8 @@ type ServerConfig struct {
 }
 
 type Server struct {
+	ReadTimeout        int    `json:"read_timeout" form:"read_timeout" mapstructure:"read_timeout"`
+	WriteTimeout       int    `json:"write_timeout" form:"write_timeout" mapstructure:"write_timeout"`
 	ServerHost         string `json:"server_host" form:"server_host" mapstructure:"server_host"`
 	ServerPort         int    `json:"server_port" form:"server_port" mapstructure:"server_port"`
 	ServerName         string `json:"server_name" form:"server_name" mapstructure:"server_name"`
