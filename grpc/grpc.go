@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// CloseGRPCConnect  关闭链接
 func CloseGRPCConnect(conn *grpc.ClientConn) {
 	if conn != nil {
 		if err := conn.Close(); err != nil {
@@ -17,6 +18,7 @@ func CloseGRPCConnect(conn *grpc.ClientConn) {
 	}
 }
 
+// GetGRPCConnect  创建链接
 func GetGRPCConnect(ctx context.Context, target string) *grpc.ClientConn {
 	conn, err := grpc.DialContext(ctx, target, grpc.WithChainUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 		grpc_zap.UnaryClientInterceptor(zap.L()),
