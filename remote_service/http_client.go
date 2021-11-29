@@ -162,11 +162,11 @@ func withJSONBody(method, url string, raw json.RawMessage, options ...Option) (r
 	opt.header["Content-Type"] = "application/json; charset=utf-8"
 	if opt.jaegerContext != nil {
 		c := opt.jaegerContext
-		tracer := c.Value("Tracer").(opentracing.Tracer)
-		parentSpanContext := c.Value("ParentSpanContext").(opentracing.SpanContext)
+		tracer := opentracing.GlobalTracer()
+		parentSpan := opentracing.SpanFromContext(c.Value("tracerContext").(context.Context))
 		span := opentracing.StartSpan(
 			url,
-			opentracing.ChildOf(parentSpanContext),
+			opentracing.ChildOf(parentSpan.Context()),
 			opentracing.Tags{
 				"method":              method,
 				"url":                 url,
@@ -237,11 +237,11 @@ func withFormBody(method, url string, form httpUrl.Values, options ...Option) (r
 	formValue := form.Encode()
 	if opt.jaegerContext != nil {
 		c := opt.jaegerContext
-		tracer := c.Value("Tracer").(opentracing.Tracer)
-		parentSpanContext := c.Value("ParentSpanContext").(opentracing.SpanContext)
+		tracer := opentracing.GlobalTracer()
+		parentSpan := opentracing.SpanFromContext(c.Value("tracerContext").(context.Context))
 		span := opentracing.StartSpan(
 			url,
-			opentracing.ChildOf(parentSpanContext),
+			opentracing.ChildOf(parentSpan.Context()),
 			opentracing.Tags{
 				"method":              method,
 				"url":                 url,
@@ -313,11 +313,11 @@ func withoutBody(method, url string, form httpUrl.Values, options ...Option) (re
 	opt.header["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
 	if opt.jaegerContext != nil {
 		c := opt.jaegerContext
-		tracer := c.Value("Tracer").(opentracing.Tracer)
-		parentSpanContext := c.Value("ParentSpanContext").(opentracing.SpanContext)
+		tracer := opentracing.GlobalTracer()
+		parentSpan := opentracing.SpanFromContext(c.Value("tracerContext").(context.Context))
 		span := opentracing.StartSpan(
 			url,
-			opentracing.ChildOf(parentSpanContext),
+			opentracing.ChildOf(parentSpan.Context()),
 			opentracing.Tags{
 				"method":              method,
 				"url":                 url,

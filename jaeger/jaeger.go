@@ -2,6 +2,7 @@ package jaeger
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/gin-gonic/gin"
@@ -83,8 +84,9 @@ func JaegerMiddleWare() gin.HandlerFunc {
 			)
 			defer parentSpan.Finish()
 		}
-		c.Set("Tracer", tracer)
-		c.Set("ParentSpanContext", parentSpan.Context())
+		// 兼容 rpc
+		ctx := opentracing.ContextWithSpan(context.Background(), parentSpan)
+		c.Set("tracerContext", ctx)
 		c.Next()
 	}
 }
