@@ -21,6 +21,8 @@ require (
 	go.uber.org/zap v1.10.0
 	google.golang.org/grpc v1.33.2
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gorm.io/driver/mysql v1.2.1
+	gorm.io/gorm v1.22.4
 )
 
 replace github.com/spf13/viper v1.9.0 => github.com/spf13/viper v1.6.3
