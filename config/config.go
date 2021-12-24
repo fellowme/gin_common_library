@@ -49,17 +49,21 @@ type RedisConf struct {
 }
 
 type MysqlConf struct {
-	Name              string        `json:"name" form:"name" mapstructure:"name"`
-	Host              string        `json:"host" form:"host" mapstructure:"host"`
-	Port              string        `json:"port" form:"port" mapstructure:"port"`
-	User              string        `json:"user" form:"user" mapstructure:"user"`
-	Password          string        `json:"password" form:"password" mapstructure:"password"`
-	Database          string        `json:"database" form:"database" mapstructure:"database"`
-	MaxIdleConnects   int           `json:"max_idle_connects" form:"max_idle_connects" mapstructure:"max_idle_connects"`
-	MaxOpenConnects   int           `json:"max_open_connects" form:"max_open_connects" mapstructure:"max_open_connects"`
-	ConnMaxLifetime   time.Duration `json:"conn_max_lifetime" form:"conn_max_lifetime" mapstructure:"conn_max_lifetime"`
-	LogModeBool       bool          `json:"log_mode_bool" form:"log_mode_bool" mapstructure:"log_mode_bool"`
-	SingularTableBool bool          `json:"singular_table_bool" form:"singular_table_bool" mapstructure:"singular_table_bool"`
+	Name                      string        `json:"name" form:"name" mapstructure:"name"`
+	Host                      string        `json:"host" form:"host" mapstructure:"host"`
+	Port                      string        `json:"port" form:"port" mapstructure:"port"`
+	User                      string        `json:"user" form:"user" mapstructure:"user"`
+	Password                  string        `json:"password" form:"password" mapstructure:"password"`
+	Database                  string        `json:"database" form:"database" mapstructure:"database"`
+	MaxIdleConnects           int           `json:"max_idle_connects" form:"max_idle_connects" mapstructure:"max_idle_connects"`
+	MaxOpenConnects           int           `json:"max_open_connects" form:"max_open_connects" mapstructure:"max_open_connects"`
+	ConnMaxLifetime           time.Duration `json:"conn_max_lifetime" form:"conn_max_lifetime" mapstructure:"conn_max_lifetime"`
+	LogModeBool               bool          `json:"log_mode_bool" form:"log_mode_bool" mapstructure:"log_mode_bool"`
+	SingularTableBool         bool          `json:"singular_table_bool" form:"singular_table_bool" mapstructure:"singular_table_bool"`
+	Colorful                  bool          `json:"colorful"`
+	IgnoreRecordNotFoundError bool          `json:"ignore_record_not_found_error"`
+	SlowThreshold             time.Duration `json:"slow_threshold"`
+	LogLevel                  int           `json:"log_level"`
 }
 
 type LoggerConfig struct {

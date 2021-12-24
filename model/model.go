@@ -3,15 +3,23 @@ package model
 import (
 	"database/sql/driver"
 	"fmt"
+	"gorm.io/plugin/soft_delete"
 	"strconv"
 	"time"
 )
 
 type BaseMysqlStruct struct {
-	Id         int       `json:"id" gorm:"primary_key;AUTO_INCREMENT;comment:'主键'"`
-	CreateTime LocalTime `json:"create_time" gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP;comment:'创建时间'"`
-	UpdateTime LocalTime `json:"update_time" gorm:"NULL; DEFAULT:NULL ON UPDATE CURRENT_TIMESTAMP;comment:'更新时间'"`
-	IsDelete   bool      `json:"is_delete" gorm:"DEFAULT:'0';comment:'是否删除 0 未删除 1删除'"`
+	Id         int                   `json:"id" gorm:"primary_key;AUTO_INCREMENT;comment:'主键'"`
+	CreateTime LocalTime             `json:"create_time" gorm:"NOT NULL;DEFAULT:CURRENT_TIMESTAMP;comment:'创建时间'"`
+	UpdateTime LocalTime             `json:"update_time" gorm:"NULL; DEFAULT:NULL ON UPDATE CURRENT_TIMESTAMP;comment:'更新时间'"`
+	IsDelete   soft_delete.DeletedAt `json:"is_delete" gorm:"softDelete:flag DEFAULT:false; comment:'是否删除 0 未删除 1删除'"`
+}
+
+type BaseMysqlStructV2 struct {
+	Id         int                   `json:"id" gorm:"primary_key;AUTO_INCREMENT;comment:主键"`
+	CreateTime LocalTime             `json:"create_time" gorm:"type:datetime;NOT NULL; DEFAULT:CURRENT_TIMESTAMP;comment:创建时间"`
+	UpdateTime LocalTime             `json:"update_time" gorm:"type:datetime;DEFAULT:NULL ON UPDATE CURRENT_TIMESTAMP;comment:更新时间"`
+	IsDelete   soft_delete.DeletedAt `json:"is_delete" gorm:"softDelete:flag DEFAULT:false;comment:是否删除 0 未删除 1删除"`
 }
 
 type LocalTime struct {

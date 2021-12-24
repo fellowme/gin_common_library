@@ -30,10 +30,10 @@ func initMysqlV2(mysqlConfig gin_config.MysqlConf) *gorm.DB {
 	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&interpolateParams=true",
 		mysqlConfig.User, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.Database)
 	db, err := gorm.Open(mysql.Open(url), &gorm.Config{Logger: gin_logger.NewSqlLogger(zap.L(), logger.Config{
-		SlowThreshold:             200 * time.Nanosecond,
-		Colorful:                  true,
-		IgnoreRecordNotFoundError: false,
-		LogLevel:                  0,
+		SlowThreshold:             mysqlConfig.SlowThreshold * time.Second,
+		Colorful:                  mysqlConfig.Colorful,
+		IgnoreRecordNotFoundError: mysqlConfig.IgnoreRecordNotFoundError,
+		LogLevel:                  logger.LogLevel(mysqlConfig.LogLevel),
 	})})
 	if err != nil {
 		zap.L().Error("mysqlV2 open fail", zap.Any("error", err))
