@@ -35,7 +35,7 @@ func GetKeyByte(name, key string) (interface{}, error) {
 func SetKeyValue(name, key string, value interface{}, expire ...int) (err error) {
 	newKey := createKey(key)
 	if len(expire) != 0 {
-		_, err = commandRedisWithRetry(name, "SET", newKey, value, "EX", expire[0])
+		_, err = commandRedisWithRetry(name, "SETEX", newKey, expire[0], value)
 	} else {
 		_, err = commandRedisWithRetry(name, "SET", newKey, value)
 	}

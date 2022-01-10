@@ -74,7 +74,7 @@ func UseRedis(name string) *redis.Pool {
 // redis 重试2次  间隔 10ms
 func commandRedisWithRetry(name, commandName string, args ...interface{}) (reply interface{}, err error) {
 	for i := 0; i < retryCount; i++ {
-		reply, err = commandRedis(name, commandName, args)
+		reply, err = commandRedis(name, commandName, args...)
 		if err == nil {
 			return
 		}
@@ -87,7 +87,7 @@ func commandRedisWithRetry(name, commandName string, args ...interface{}) (reply
 func commandRedis(name, commandName string, args ...interface{}) (reply interface{}, err error) {
 	selectRedis := UseRedis(name).Get()
 	nowTime := time.Now()
-	reply, err = selectRedis.Do(commandName, args)
+	reply, err = selectRedis.Do(commandName, args...)
 	costTime := time.Since(nowTime) * time.Second
 	if err != nil {
 		zap.L().Error("redis do fail", zap.Any("error", err),
