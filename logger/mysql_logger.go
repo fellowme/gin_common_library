@@ -26,9 +26,10 @@ func (l Logger) LogMode(level gorm_logger.LogLevel) gorm_logger.Interface {
 	l.LogConfig.LogLevel = level
 	return l
 }
+
 func (l Logger) Info(ctx context.Context, str string, args ...interface{}) {
 	if l.LogConfig.LogLevel >= gorm_logger.Info {
-		l.ZapLogger.Sugar().Debugf(str, args...)
+		l.ZapLogger.Sugar().Infof(str, args...)
 	}
 }
 
@@ -60,6 +61,7 @@ func (l Logger) Trace(ctx context.Context, begin time.Time, fc func() (string, i
 		l.ZapLogger.Warn("trace", zap.Duration("cost_time", costTime), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.LogConfig.LogLevel >= gorm_logger.Info:
 		sql, rows := fc()
-		l.ZapLogger.Debug("trace", zap.Duration("cost_time", costTime), zap.Int64("rows", rows), zap.String("sql", sql))
+		l.ZapLogger.Info("trace", zap.Duration("cost_time", costTime), zap.Int64("rows", rows), zap.String("sql", sql))
 	}
+
 }

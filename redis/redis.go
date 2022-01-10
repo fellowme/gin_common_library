@@ -88,12 +88,12 @@ func commandRedis(name, commandName string, args ...interface{}) (reply interfac
 	selectRedis := UseRedis(name).Get()
 	nowTime := time.Now()
 	reply, err = selectRedis.Do(commandName, args...)
-	costTime := time.Since(nowTime) * time.Second
+	costTime := time.Since(nowTime)
 	if err != nil {
-		zap.L().Error("redis do fail", zap.Any("error", err),
+		zap.L().Error("redis do fail", zap.Any("error", err), zap.Duration("costTime", costTime),
 			zap.String("commandName", commandName), zap.Any("args", args))
 	} else {
-		zap.L().Info("redis do success", zap.Int64("costTime", int64(costTime)),
+		zap.L().Info("redis do success", zap.Duration("costTime", costTime),
 			zap.String("commandName", commandName), zap.Any("args", args))
 
 	}
