@@ -11,6 +11,7 @@ var (
 )
 
 func RandomString(length int) string {
+	rand.Seed(time.Now().UnixNano())
 	result := make([]byte, 0)
 	for i := 0; i < length; i++ {
 		result = append(result, byteArray[rand.Intn(bytesLen)])

@@ -17,6 +17,7 @@ type Server struct {
 	WriteTimeout       int    `json:"write_timeout" form:"write_timeout" mapstructure:"write_timeout"`
 	ServerHost         string `json:"server_host" form:"server_host" mapstructure:"server_host"`
 	ServerPort         int    `json:"server_port" form:"server_port" mapstructure:"server_port"`
+	ServerRpcPort      int    `json:"server_rpc_port" form:"server_rpc_port" mapstructure:"server_rpc_port"`
 	ServerName         string `json:"server_name" form:"server_name" mapstructure:"server_name"`
 	Path               string `json:"path" form:"path" mapstructure:"path"`
 	IsDebug            bool   `json:"is_debug" form:"is_debug" mapstructure:"is_debug"`
@@ -60,10 +61,10 @@ type MysqlConf struct {
 	ConnMaxLifetime           time.Duration `json:"conn_max_lifetime" form:"conn_max_lifetime" mapstructure:"conn_max_lifetime"`
 	LogModeBool               bool          `json:"log_mode_bool" form:"log_mode_bool" mapstructure:"log_mode_bool"`
 	SingularTableBool         bool          `json:"singular_table_bool" form:"singular_table_bool" mapstructure:"singular_table_bool"`
-	Colorful                  bool          `json:"colorful"`
-	IgnoreRecordNotFoundError bool          `json:"ignore_record_not_found_error"`
-	SlowThreshold             time.Duration `json:"slow_threshold"`
-	LogLevel                  int           `json:"log_level"`
+	Colorful                  bool          `json:"colorful" mapstructure:"colorful"`
+	IgnoreRecordNotFoundError bool          `json:"ignore_record_not_found_error" mapstructure:"ignore_record_not_found_error"`
+	SlowThreshold             time.Duration `json:"slow_threshold" mapstructure:"slow_threshold"`
+	LogLevel                  int           `json:"log_level" mapstructure:"log_level"`
 }
 
 type LoggerConfig struct {
