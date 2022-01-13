@@ -4,6 +4,9 @@ go 1.15
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
+	github.com/alibabacloud-go/darabonba-openapi v0.1.14
+	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.8
+	github.com/alibabacloud-go/tea v1.1.17
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/locales v0.13.0

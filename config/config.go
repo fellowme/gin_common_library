@@ -3,13 +3,14 @@ package config
 import "time"
 
 type ServerConfig struct {
-	RedisConfigs  []RedisConf   `json:"redis_configs" form:"redis_configs" mapstructure:"redis_configs"`
-	MysqlConfigs  []MysqlConf   `json:"mysql_configs" form:"mysql_configs" mapstructure:"mysql_configs"`
-	RocketMqConf  RocketMqConf  `json:"rocket_mq_conf" form:"rocket_mq_conf" mapstructure:"rocket_mq_conf"`
-	LoggerConfig  LoggerConfig  `json:"logger_config" form:"logger_config" mapstructure:"logger_config"`
-	Server        Server        `json:"server" form:"server" mapstructure:"server"`
-	JaegerConfig  JaegerConfig  `json:"jaeger_config" form:"jaeger_config" mapstructure:"jaeger_config"`
-	ElasticConfig ElasticConfig `json:"elastic_config" form:"elastic_config" mapstructure:"elastic_config"`
+	RedisConfigs              []RedisConf               `json:"redis_configs" form:"redis_configs" mapstructure:"redis_configs"`
+	MysqlConfigs              []MysqlConf               `json:"mysql_configs" form:"mysql_configs" mapstructure:"mysql_configs"`
+	RocketMqConf              RocketMqConf              `json:"rocket_mq_conf" form:"rocket_mq_conf" mapstructure:"rocket_mq_conf"`
+	LoggerConfig              LoggerConfig              `json:"logger_config" form:"logger_config" mapstructure:"logger_config"`
+	Server                    Server                    `json:"server" form:"server" mapstructure:"server"`
+	JaegerConfig              JaegerConfig              `json:"jaeger_config" form:"jaeger_config" mapstructure:"jaeger_config"`
+	ElasticConfig             ElasticConfig             `json:"elastic_config" form:"elastic_config" mapstructure:"elastic_config"`
+	AliYunSendPhoneCodeConfig AliYunSendPhoneCodeConfig `json:"ali_yun_send_phone_code_config" mapstructure:"ali_yun_send_phone_code_config"`
 }
 
 type Server struct {
@@ -88,4 +89,10 @@ type ElasticConfig struct {
 	Port     int    `json:"port" form:"port" mapstructure:"port"`
 	UserName string `json:"user_name" form:"user_name" mapstructure:"user_name"`
 	Password string `json:"password" form:"password" mapstructure:"password"`
+}
+
+type AliYunSendPhoneCodeConfig struct {
+	AccessKeyId     string `json:"access_key_id,omitempty" mapstructure:"access_key_id"`
+	AccessKeySecret string `json:"access_key_secret,omitempty" mapstructure:"access_key_secret"`
+	Endpoint        string `json:"endpoint" form:"endpoint" mapstructure:"endpoint"`
 }
