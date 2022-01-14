@@ -1,9 +1,7 @@
 package redis
 
 import (
-	"errors"
 	gin_config "github.com/fellowme/gin_common_library/config"
-	gin_util "github.com/fellowme/gin_common_library/util"
 	"github.com/gomodule/redigo/redis"
 	"go.uber.org/zap"
 	"strings"
@@ -77,20 +75,10 @@ func DecrbyKey(name, key string, number int64) (num int64, err error) {
 	return
 }
 
-// DeleteKeys  ****   删除多个key name:redis名称 key:删除key 返回 error *****//
-func DeleteKeys(name string, key ...string) error {
-	if len(key) == 0 {
-		return errors.New("delete key empty")
-	}
-	keys := gin_util.RemoveSliceEmpty(key)
-	if len(keys) == 0 {
-		return errors.New("delete RemoveSliceEmpty key empty")
-	}
-	newKeys := make([]string, 0)
-	for _, key := range keys {
-		newKeys = append(newKeys, createKey(key))
-	}
-	_, err := commandRedisWithRetry(name, "DEL", newKeys)
+// DeleteKey  ****   删除key name:redis名称 key:删除key 返回 error *****//
+func DeleteKey(name string, key string) error {
+	newKey := createKey(key)
+	_, err := commandRedisWithRetry(name, "DEL", newKey)
 	return err
 }
 
