@@ -1,8 +1,10 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
+	gin_const "github.com/fellowme/gin_common_library/const"
 	gin_logger "github.com/fellowme/gin_common_library/logger"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
@@ -69,4 +71,17 @@ func UseMysqlV2(target map[string]*gorm.DB, name ...string) *gorm.DB {
 		return nil
 	}
 	return mysqlDB
+}
+
+func GetTxWithContext(target map[string]*gorm.DB, ctx context.Context, tableName string, name ...string) (*gorm.DB, context.CancelFunc) {
+	mysqlDB := UseMysqlV2(target, name...)
+	if mysqlDB == nil {
+		return nil, nil
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	contextTimeout, cancel := context.WithTimeout(ctx, gin_const.DefaultTxContextTimeOut)
+	tx := mysqlDB.WithContext(contextTimeout).Table(tableName)
+	return tx, cancel
 }
