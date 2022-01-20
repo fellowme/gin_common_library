@@ -50,6 +50,20 @@ func initMysql(mysqlConfig gin_config.MysqlConf) *gorm.DB {
 	return db
 }
 
+func CloseMysqlConnect() {
+	if len(mysqlMap) != 0 {
+		for key, mysqlPool := range mysqlMap {
+			sqlDB, err := mysqlPool.DB()
+			if err != nil {
+				zap.L().Error("mysql sql.DB fail", zap.Any("error", err))
+			}
+			if err := sqlDB.Close(); err != nil {
+				zap.L().Error("mysql close error", zap.String("mysqlName", key))
+			}
+		}
+	}
+}
+
 func GetMysqlMap() map[string]*gorm.DB {
 	if len(mysqlMap) == 0 {
 		InitMysqlMap()
