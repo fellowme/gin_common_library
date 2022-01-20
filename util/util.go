@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	SuccessCode = 0
-	FailCode    = -1
+	SuccessCode    = 0
+	FailCode       = -1
+	DefaultVersion = 1.0
 )
 
 var msgFlags = map[int]string{
@@ -26,14 +27,18 @@ func getMsg(code int) string {
 	return msgFlags[-1]
 }
 
-func ReturnResponse(httpCode, errCode int, message interface{}, data interface{}, c *gin.Context, version ...int) {
+func ReturnResponse(httpCode, errCode int, message interface{}, data interface{}, c *gin.Context, version ...float64) {
+	jsonVersion := DefaultVersion
+	if len(version) == 0 {
+		jsonVersion = version[0]
+	}
 	c.JSON(httpCode, gin.H{
 		"error_code":      errCode,
 		"error_tip":       getMsg(errCode),
 		"message":         message,
 		"data":            data,
 		"mapi_query_time": NowTimeToString(),
-		"version":         version,
+		"version":         jsonVersion,
 	})
 }
 

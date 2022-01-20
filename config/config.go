@@ -14,6 +14,7 @@ type ServerConfig struct {
 }
 
 type Server struct {
+	SignKey            string `json:"sign_key" mapstructure:"sign_key"`
 	ReadTimeout        int    `json:"read_timeout" form:"read_timeout" mapstructure:"read_timeout"`
 	WriteTimeout       int    `json:"write_timeout" form:"write_timeout" mapstructure:"write_timeout"`
 	ServerHost         string `json:"server_host" form:"server_host" mapstructure:"server_host"`

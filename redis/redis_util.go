@@ -85,7 +85,7 @@ func DeleteKey(name string, key string) error {
 // SetBitmapKey  ****   设置bitmap  name:redis名称 key:删除key offset:偏移量 value:只能0，1  返回 error *****//
 func SetBitmapKey(name, key string, offset, value int) error {
 	newKey := createKey(key)
-	_, err := commandRedis(name, "SetBit", newKey, offset, value)
+	_, err := commandRedis(name, "SETBIT", newKey, offset, value)
 	if err != nil {
 		zap.L().Error("SetBitmapKey fail", zap.String("newKey", newKey),
 			zap.Int("offset", offset), zap.String("name", name), zap.String("key", key),
@@ -97,7 +97,7 @@ func SetBitmapKey(name, key string, offset, value int) error {
 // GetBitmapKey  ****   获取bitmap name:redis名称 key:删除key offset:偏移量  返回 int error *****//
 func GetBitmapKey(name, key string, offset int) (int, error) {
 	newKey := createKey(key)
-	result, err := redis.Int(commandRedis(name, "GetBit", newKey, offset))
+	result, err := redis.Int(commandRedis(name, "GETBIT", newKey, offset))
 	if err != nil {
 		zap.L().Error("GetBitmapKey fail", zap.String("newKey", newKey),
 			zap.Int("offset", offset), zap.String("name", name), zap.String("key", key))

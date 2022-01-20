@@ -1,8 +1,15 @@
 package util
 
-import "time"
+import (
+	gin_const "github.com/fellowme/gin_common_library/const"
+	"time"
+)
 
 //NowTimeToString *******现在日期格式化 yyyy-MM-dd HH:mm:ss*******//
 func NowTimeToString() string {
-	return time.Now().Format("2006-01-02 15:04:05")
+	return time.Now().Format(gin_const.TimeFormat)
+}
+
+func NowDateToString() string {
+	return time.Now().Format(gin_const.TimeFormatDate)
 }

@@ -1,15 +1,17 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	gin_const "github.com/fellowme/gin_common_library/const"
+	gin_logger "github.com/fellowme/gin_common_library/logger"
 	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"time"
 )
-
-const mysqlNameDefault = "default"
 
 var mysqlMap map[string]*gorm.DB
 
@@ -26,6 +28,28 @@ func InitMysqlMap() {
 	}
 }
 
+func initMysql(mysqlConfig gin_config.MysqlConf) *gorm.DB {
+	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&interpolateParams=true",
+		mysqlConfig.User, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.Database)
+	db, err := gorm.Open(mysql.Open(url), &gorm.Config{Logger: gin_logger.NewSqlLogger(zap.L(), logger.Config{
+		SlowThreshold:             mysqlConfig.SlowThreshold * time.Second,
+		Colorful:                  mysqlConfig.Colorful,
+		IgnoreRecordNotFoundError: mysqlConfig.IgnoreRecordNotFoundError,
+		LogLevel:                  logger.LogLevel(mysqlConfig.LogLevel),
+	})})
+	if err != nil {
+		zap.L().Error("mysql open fail", zap.Any("error", err))
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		zap.L().Error("mysql sql.DB fail", zap.Any("error", err))
+	}
+	sqlDB.SetConnMaxLifetime(mysqlConfig.ConnMaxLifetime * time.Second)
+	sqlDB.SetMaxIdleConns(mysqlConfig.MaxIdleConnects)
+	sqlDB.SetMaxOpenConns(mysqlConfig.MaxOpenConnects)
+	return db
+}
+
 func GetMysqlMap() map[string]*gorm.DB {
 	if len(mysqlMap) == 0 {
 		InitMysqlMap()
@@ -37,76 +61,27 @@ func UseMysql(target map[string]*gorm.DB, name ...string) *gorm.DB {
 	if target == nil {
 		target = mysqlMap
 	}
-	mysqlName := mysqlNameDefault
+	mysqlName := gin_const.MysqlNameDefault
 	if len(name) != 0 {
 		mysqlName = name[0]
 	}
-	mysql, ok := target[mysqlName]
+	mysqlDB, ok := target[mysqlName]
 	if !ok {
 		zap.L().Error("UseMysql fail not find right connect", zap.Any("name", name))
 		return nil
 	}
-	return mysql
+	return mysqlDB
 }
 
-func initMysql(mysqlConfig gin_config.MysqlConf) *gorm.DB {
-	var err error
-	url := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local&interpolateParams=true",
-		mysqlConfig.User, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.Database)
-	db, err := gorm.Open("mysql", url)
-	if err != nil {
-		zap.L().Error("mysql init error", zap.Any("error", err), zap.Any("mysqlConfig", mysqlConfig))
-		return nil
+func GetTxWithContext(target map[string]*gorm.DB, ctx context.Context, tableName string, name ...string) (*gorm.DB, context.CancelFunc) {
+	mysqlDB := UseMysql(target, name...)
+	if mysqlDB == nil {
+		return nil, nil
 	}
-	db.LogMode(mysqlConfig.LogModeBool)
-	db.SingularTable(mysqlConfig.SingularTableBool)
-	db.DB().SetConnMaxLifetime(mysqlConfig.ConnMaxLifetime * time.Second)
-	db.DB().SetMaxIdleConns(mysqlConfig.MaxIdleConnects)
-	db.DB().SetMaxOpenConns(mysqlConfig.MaxOpenConnects)
-	//db.Callback().Create().Before("gorm:create").Register("update_created_time", updateTimeStampForCreateCallback)
-	//db.Callback().Create().Before("gorm:update").Register("update_time", updateTimeStampForUpdateCallback)
-	return db
-}
-
-func CloseMysqlPool() {
-	if len(mysqlMap) != 0 {
-		for key, mysqlPool := range mysqlMap {
-			if err := mysqlPool.Close(); err != nil {
-				zap.L().Error("mysql close error", zap.String("mysqlName", key))
-			}
-		}
+	if ctx == nil {
+		ctx = context.Background()
 	}
+	contextTimeout, cancel := context.WithTimeout(ctx, gin_const.DefaultTxContextTimeOut)
+	tx := mysqlDB.WithContext(contextTimeout).Table(tableName)
+	return tx, cancel
 }
-
-//// updateTimeStampForCreateCallback 注册新建钩子在持久化之前  *******创建之前******//
-//func updateTimeStampForCreateCallback(scope *gorm.Scope) {
-//	if !scope.HasError() {
-//		if createTimeField, ok := scope.FieldByName("create_time"); ok {
-//			if createTimeField.IsBlank {
-//				if err := createTimeField.Set(time.Now()); err != nil {
-//					zap.L().Error("updateTimeStampForCreateCallback  createTimeField error", zap.Any("error", err))
-//				}
-//			}
-//		}
-//		if modifyTimeField, ok := scope.FieldByName("update_time"); ok {
-//			if modifyTimeField.IsBlank {
-//				if err := modifyTimeField.Set(time.Now()); err != nil {
-//					zap.L().Error("updateTimeStampForCreateCallback  modifyTimeField error", zap.Any("error", err))
-//				}
-//			}
-//		}
-//	}
-//}
-//
-//// updateTimeStampForUpdateCallback 注册新建钩子在持久化之前  *******更新之前******//
-//func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
-//	if !scope.HasError() {
-//		if modifyTimeField, ok := scope.FieldByName("update_time"); ok {
-//			if modifyTimeField.IsBlank {
-//				if err := modifyTimeField.Set(time.Now()); err != nil {
-//					zap.L().Error("updateTimeStampForCreateCallback  modifyTimeField error", zap.Any("error", err))
-//				}
-//			}
-//		}
-//	}
-//}

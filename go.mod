@@ -7,6 +7,7 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi v0.1.14
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.8
 	github.com/alibabacloud-go/tea v1.1.17
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/locales v0.13.0
@@ -14,7 +15,6 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gomodule/redigo v1.8.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
-	github.com/jinzhu/gorm v1.9.16
 	github.com/olivere/elastic/v7 v7.0.29
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
