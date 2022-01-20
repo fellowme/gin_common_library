@@ -29,7 +29,7 @@ func getMsg(code int) string {
 
 func ReturnResponse(httpCode, errCode int, message interface{}, data interface{}, c *gin.Context, version ...float64) {
 	jsonVersion := DefaultVersion
-	if len(version) == 0 {
+	if len(version) != 0 {
 		jsonVersion = version[0]
 	}
 	c.JSON(httpCode, gin.H{
