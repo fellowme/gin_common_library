@@ -43,7 +43,7 @@ func creatApp(configPath string, serverName string) *gin.Engine {
 /*
 	CreateServer 创建server
 */
-func CreateServer(basePath, configPath string, serverName string) (string, *gin.Engine) {
+func CreateServer(configPath string, serverName string) (string, *gin.Engine) {
 	if !gin_config.ServerConfigSettings.Server.IsDebug {
 		gin.SetMode(gin.ReleaseMode)
 	}
