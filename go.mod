@@ -7,8 +7,10 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi v0.1.14
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.8
 	github.com/alibabacloud-go/tea v1.1.17
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.5.1
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
