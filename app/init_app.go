@@ -32,7 +32,7 @@ func initCommonExtend(configPath string, serverName string) {
 /*
 	creatApp 初始化app
 */
-func creatApp(configPath string, serverName string) *gin.Engine {
+func creatApp(configPath, serverName string) *gin.Engine {
 	initCommonExtend(configPath, serverName)
 	app := gin.New()
 	app.Use(gin_logger.RecoveryWithZap(gin_logger.RecoveryLogger,
@@ -43,7 +43,7 @@ func creatApp(configPath string, serverName string) *gin.Engine {
 /*
 	CreateServer 创建server
 */
-func CreateServer(configPath string, serverName string) (string, *gin.Engine) {
+func CreateServer(configPath, serverName string) (string, *gin.Engine) {
 	if !gin_config.ServerConfigSettings.Server.IsDebug {
 		gin.SetMode(gin.ReleaseMode)
 	}
