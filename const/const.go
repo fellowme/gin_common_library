@@ -17,7 +17,10 @@ const (
 	DefaultJwtExpiresAt     = 2 * time.Hour
 )
 
-const MysqlNameDefault = "default"
+const (
+	MysqlNameDefault     = "default"
+	DefaultMenuTableName = "gin_menu"
+)
 
 const (
 	TimeFormat     = "2006-01-02 15:04:05"
