@@ -30,7 +30,7 @@ func initExtend(configPath, serverName string) {
 	gin_mysql.InitMysqlMap()
 }
 
-func CreateRpcServer(configPath, serverName string) {
+func InitRpcServer(configPath, serverName string) *grpc.Server {
 	initExtend(configPath, serverName)
 	gRpcService := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -39,23 +39,26 @@ func CreateRpcServer(configPath, serverName string) {
 			grpc_opentracing.UnaryServerInterceptor(),
 			grpc_zap.UnaryServerInterceptor(zap.L()),
 		)))
+	return gRpcService
+}
+
+func CreateRpcServer(gRpcService *grpc.Server) {
 	defer gRpcService.GracefulStop()
 	defer DeferClose()
 	endPoint := fmt.Sprintf("%s:%d", gin_config.ServerConfigSettings.Server.ServerHost,
 		gin_config.ServerConfigSettings.Server.ServerRpcPort)
 	listener, err := net.Listen("tcp", endPoint)
 	if err != nil {
-		zap.L().Error("rpc listener error", zap.Any("error", err), zap.String("server_name", serverName))
+		zap.L().Error("rpc listener error", zap.Any("error", err))
 		return
 	}
 	err = gRpcService.Serve(listener)
-	zap.L().Info("grpc server 启动")
+	zap.L().Info("grpc server starting ...")
 	if err != nil {
-		zap.L().Error("rpc Serve error", zap.Any("error", err), zap.String("server_name", serverName))
+		zap.L().Error("rpc Serve error", zap.Any("error", err))
 		return
 	}
 }
-
 func deferClose() {
 	gin_mysql.CloseMysqlConnect()
 	gin_jaeger.IoCloser()
