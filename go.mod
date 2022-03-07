@@ -31,4 +31,4 @@ require (
 	gorm.io/plugin/soft_delete v1.0.5
 )
 
-replace github.com/spf13/viper v1.9.0 => github.com/spf13/viper v1.6.3
+replace github.com/spf13/viper v1.9.0 => github.com/spf13/viper v1.7.1
