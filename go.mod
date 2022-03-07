@@ -20,7 +20,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.29
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/viper v1.9.0
+	github.com/spf13/viper v1.6.3
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	go.uber.org/zap v1.10.0
@@ -30,5 +30,3 @@ require (
 	gorm.io/gorm v1.22.4
 	gorm.io/plugin/soft_delete v1.0.5
 )
-
-replace github.com/spf13/viper v1.9.0 => github.com/spf13/viper v1.7.1
