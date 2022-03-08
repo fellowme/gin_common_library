@@ -5,7 +5,7 @@ import "time"
 type ServerConfig struct {
 	RedisConfigs              []RedisConf               `json:"redis_configs" form:"redis_configs" mapstructure:"redis_configs"`
 	MysqlConfigs              []MysqlConf               `json:"mysql_configs" form:"mysql_configs" mapstructure:"mysql_configs"`
-	RocketMqConf              RocketMqConf              `json:"rocket_mq_conf" form:"rocket_mq_conf" mapstructure:"rocket_mq_conf"`
+	PulsarMqConf              PulsarMqConf              `json:"pulsar_mq_conf" mapstructure:"pulsar_mq_conf"`
 	LoggerConfig              LoggerConfig              `json:"logger_config" form:"logger_config" mapstructure:"logger_config"`
 	Server                    Server                    `json:"server" form:"server" mapstructure:"server"`
 	JaegerConfig              JaegerConfig              `json:"jaeger_config" form:"jaeger_config" mapstructure:"jaeger_config"`
@@ -26,14 +26,6 @@ type Server struct {
 	PassportUrl        string `json:"passport_url" form:"passport_url" mapstructure:"passport_url"`
 	RedisPrefix        string `json:"redis_prefix" form:"redis_prefix" mapstructure:"redis_prefix"`
 	RedisCharacterMark string `json:"redis_character_mark" form:"redis_character_mark" mapstructure:"redis_character_mark"`
-}
-
-type RocketMqConf struct {
-	Endpoint    string            `json:"endpoint" form:"endpoint" mapstructure:"endpoint"`       // 设置HTTP接入域名（此处以公共云生产环境为例）
-	AccessKey   string            `json:"access_key" form:"access_key" mapstructure:"access_key"` // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
-	SecretKey   string            `json:"secret_key" form:"secret_key" mapstructure:"secret_key"` // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
-	InstanceIds map[string]string `json:"instance_ids" form:"instance_ids" mapstructure:"instance_ids"`
-	InstanceId  string            `json:"instance_id" form:"instance_id" mapstructure:"instance_id"` // Topic所属实例ID，默认实例为空
 }
 
 type RedisConf struct {
@@ -96,4 +88,12 @@ type AliYunSendPhoneCodeConfig struct {
 	AccessKeyId     string `json:"access_key_id,omitempty" mapstructure:"access_key_id"`
 	AccessKeySecret string `json:"access_key_secret,omitempty" mapstructure:"access_key_secret"`
 	Endpoint        string `json:"endpoint" form:"endpoint" mapstructure:"endpoint"`
+}
+
+type PulsarMqConf struct {
+	PulsarUrl           string            `json:"pulsar_url" mapstructure:"endpoint"`           // 设置HTTP接入域名（此处以公共云生产环境为例）
+	OperationTimeout    time.Duration     `json:"operation_timeout" mapstructure:"access_key"`  // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
+	ConnectionTimeout   time.Duration     `json:"connection_timeout" mapstructure:"secret_key"` // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
+	CustomMetricsLabels map[string]string `json:"custom_metrics_labels" mapstructure:"custom_metrics_labels"`
+	Timeout             time.Duration     `json:"timeout" mapstructure:"timeout"`
 }
