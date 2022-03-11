@@ -11,3 +11,8 @@ const (
 	SuccessTip       = "success"
 	ActionSuccessTip = "操作成功"
 )
+
+const (
+	RequestHeadMethod   = "head"
+	RequestOptionMethod = "options"
+)

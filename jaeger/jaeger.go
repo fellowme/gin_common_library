@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
+	gin_util "github.com/fellowme/gin_common_library/util"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -12,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
+	"strings"
 )
 
 var tracer opentracing.Tracer
@@ -41,13 +43,19 @@ func InitJaegerTracer() {
 }
 
 func IoCloser() {
-	if err := closer.Close(); err != nil {
-		zap.L().Error("JaegerTracer IoCloser fail", zap.Any("error", err))
+	if closer != nil {
+		if err := closer.Close(); err != nil {
+			zap.L().Error("JaegerTracer IoCloser fail", zap.Any("error", err))
+		}
 	}
 }
 
-func JaegerMiddleWare() gin.HandlerFunc {
+func TracerJaegerMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//  head 请求放过
+		if strings.ToLower(c.Request.Method) == gin_util.RequestHeadMethod || strings.ToLower(c.Request.Method) == gin_util.RequestOptionMethod {
+			c.Next()
+		}
 		var parentSpan opentracing.Span
 		var bodyBytes []byte
 		if c.Request.Body != nil {

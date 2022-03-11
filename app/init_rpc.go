@@ -3,12 +3,6 @@ package app
 import (
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
-	gin_jaeger "github.com/fellowme/gin_common_library/jaeger"
-	gin_logger "github.com/fellowme/gin_common_library/logger"
-	gin_mysql "github.com/fellowme/gin_common_library/mysql"
-	gin_redis "github.com/fellowme/gin_common_library/redis"
-	gin_translator "github.com/fellowme/gin_common_library/translator"
-	gin_util "github.com/fellowme/gin_common_library/util"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -19,19 +13,8 @@ import (
 	"net"
 )
 
-func initExtend(configPath, serverName string) {
-	path := gin_util.GetPath()
-	gin_config.InitConfig(path+configPath, serverName)
-	gin_logger.InitServerLogger(path)
-	gin_logger.InitRecoveryLogger(path)
-	gin_jaeger.InitJaegerTracer()
-	gin_translator.InitTranslator()
-	gin_redis.InitRedis()
-	gin_mysql.InitMysqlMap()
-}
-
 func InitRpcServer(configPath, serverName string) *grpc.Server {
-	initExtend(configPath, serverName)
+	initCommonExtend(configPath, serverName)
 	gRpcService := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_recovery.UnaryServerInterceptor(),
@@ -44,7 +27,7 @@ func InitRpcServer(configPath, serverName string) *grpc.Server {
 
 func CreateRpcServer(gRpcService *grpc.Server) {
 	defer gRpcService.GracefulStop()
-	defer DeferClose()
+	defer deferClose()
 	endPoint := fmt.Sprintf("%s:%d", gin_config.ServerConfigSettings.Server.ServerHost,
 		gin_config.ServerConfigSettings.Server.ServerRpcPort)
 	listener, err := net.Listen("tcp", endPoint)
@@ -58,9 +41,4 @@ func CreateRpcServer(gRpcService *grpc.Server) {
 		zap.L().Error("rpc Serve error", zap.Any("error", err))
 		return
 	}
-}
-func deferClose() {
-	gin_mysql.CloseMysqlConnect()
-	gin_jaeger.IoCloser()
-	gin_redis.CloseRedisPool()
 }

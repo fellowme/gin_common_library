@@ -56,7 +56,7 @@ func GetRedisConnect(redisConfig gin_config.RedisConf) func() (redis.Conn, error
 	}
 }
 
-// 获取使用的redis
+// UseRedis 获取使用的redis
 func UseRedis(name string) *redis.Pool {
 	if len(redisMap) == 0 {
 		InitRedis()
@@ -108,7 +108,7 @@ func closeRedisConnect(redisConnect redis.Conn) {
 	}
 }
 
-// 关闭 所有redis pool
+// CloseRedisPool 关闭 所有redis pool
 func CloseRedisPool() {
 	if len(redisMap) != 0 {
 		for index, pool := range redisMap {

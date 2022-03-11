@@ -20,10 +20,10 @@ type Server struct {
 	ServerHost         string `json:"server_host" form:"server_host" mapstructure:"server_host"`
 	ServerPort         int    `json:"server_port" form:"server_port" mapstructure:"server_port"`
 	ServerRpcPort      int    `json:"server_rpc_port" form:"server_rpc_port" mapstructure:"server_rpc_port"`
+	ServerMqPort       int    `json:"server_mq_port" form:"server_mq_port" mapstructure:"server_mq_port"`
 	ServerName         string `json:"server_name" form:"server_name" mapstructure:"server_name"`
 	Path               string `json:"path" form:"path" mapstructure:"path"`
 	IsDebug            bool   `json:"is_debug" form:"is_debug" mapstructure:"is_debug"`
-	PassportUrl        string `json:"passport_url" form:"passport_url" mapstructure:"passport_url"`
 	RedisPrefix        string `json:"redis_prefix" form:"redis_prefix" mapstructure:"redis_prefix"`
 	RedisCharacterMark string `json:"redis_character_mark" form:"redis_character_mark" mapstructure:"redis_character_mark"`
 }
@@ -91,9 +91,9 @@ type AliYunSendPhoneCodeConfig struct {
 }
 
 type PulsarMqConf struct {
-	PulsarUrl           string            `json:"pulsar_url" mapstructure:"endpoint"`           // 设置HTTP接入域名（此处以公共云生产环境为例）
-	OperationTimeout    time.Duration     `json:"operation_timeout" mapstructure:"access_key"`  // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
-	ConnectionTimeout   time.Duration     `json:"connection_timeout" mapstructure:"secret_key"` // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
+	PulsarUrl           string            `json:"pulsar_url" mapstructure:"pulsar_url"`                 // 设置HTTP接入域名（此处以公共云生产环境为例）
+	OperationTimeout    time.Duration     `json:"operation_timeout" mapstructure:"operation_timeout"`   // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
+	ConnectionTimeout   time.Duration     `json:"connection_timeout" mapstructure:"connection_timeout"` // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
 	CustomMetricsLabels map[string]string `json:"custom_metrics_labels" mapstructure:"custom_metrics_labels"`
 	Timeout             time.Duration     `json:"timeout" mapstructure:"timeout"`
 }
