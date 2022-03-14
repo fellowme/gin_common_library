@@ -2,11 +2,11 @@ package jwt
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
 	gin_config "github.com/fellowme/gin_common_library/config"
 	gin_const "github.com/fellowme/gin_common_library/const"
 	gin_util "github.com/fellowme/gin_common_library/util"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"net/http"
 	"time"
 )
@@ -52,7 +52,7 @@ type Jwt struct {
 
 type CustomClaims struct {
 	UserId int `json:"userId"`
-	jwt.StandardClaims
+	*jwt.StandardClaims
 }
 
 func NewJwt() *Jwt {
