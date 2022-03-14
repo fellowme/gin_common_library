@@ -3,7 +3,6 @@ package mq
 import (
 	"context"
 	"github.com/apache/pulsar-client-go/pulsar"
-	gin_config "github.com/fellowme/gin_common_library/config"
 	gin_const "github.com/fellowme/gin_common_library/const"
 	"go.uber.org/zap"
 	"time"
@@ -17,10 +16,8 @@ func ReceivePulsarMqMessage(pulsarOptions pulsar.ConsumerOptions, f func(message
 		return
 	}
 	defer consumer.Close()
-	ctx, cancel := context.WithTimeout(context.Background(), gin_config.ServerConfigSettings.PulsarMqConf.Timeout*time.Second)
-	defer cancel()
 	for {
-		msg, err := consumer.Receive(ctx)
+		msg, err := consumer.Receive(context.Background())
 		if err != nil {
 			zap.L().Error("ReceivePulsarMqMessage pulsarClient Receive error ", zap.Any("error", err))
 			stopChan <- err

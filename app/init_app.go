@@ -39,7 +39,7 @@ func CreateAppServer(configPath, serverName string, f func(group *gin.RouterGrou
 	//  激活测活  加入新的路由
 	initRouter(app, f)
 	//  将新路由 添加到数据库
-	gin_router.RegisterRouter(app.Routes())
+	gin_router.RegisterRouter(app.Routes(), serverName)
 	//  endless 启动
 	endless.DefaultReadTimeOut = time.Duration(gin_config.ServerConfigSettings.Server.ReadTimeout) * time.Second
 	endless.DefaultWriteTimeOut = time.Duration(gin_config.ServerConfigSettings.Server.WriteTimeout) * time.Second

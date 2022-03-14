@@ -7,11 +7,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func SendPulsarMqMessage(pulsarOptions pulsar.ProducerOptions, message pulsar.ProducerMessage) (string, error) {
+func SendPulsarMqMessage(pulsarOptions pulsar.ProducerOptions, message pulsar.ProducerMessage) (pulsar.MessageID, error) {
 	producer, err := getPulsarClient().CreateProducer(pulsarOptions)
 	if err != nil {
 		zap.L().Error("SendPulsarMq pulsarClient CreateProducer error ", zap.Any("error", err))
-		return "", err
+		return nil, err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), gin_config.ServerConfigSettings.PulsarMqConf.Timeout)
 	defer cancel()
@@ -19,5 +19,5 @@ func SendPulsarMqMessage(pulsarOptions pulsar.ProducerOptions, message pulsar.Pr
 	messageId, err := producer.Send(ctx, &message)
 	defer producer.Close()
 	zap.L().Info("SendPulsarMqMessage end ", zap.Any("pulsarOptions", pulsarOptions), zap.Any("message", message), zap.Any("messageId", messageId))
-	return string(messageId.Serialize()), err
+	return messageId, err
 }
