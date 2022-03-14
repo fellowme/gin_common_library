@@ -95,4 +95,5 @@ type PulsarMqConf struct {
 	OperationTimeout    time.Duration     `json:"operation_timeout" mapstructure:"operation_timeout"`   // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
 	ConnectionTimeout   time.Duration     `json:"connection_timeout" mapstructure:"connection_timeout"` // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
 	CustomMetricsLabels map[string]string `json:"custom_metrics_labels" mapstructure:"custom_metrics_labels"`
+	Timeout             time.Duration     `json:"timeout" mapstructure:"timeout"`
 }
