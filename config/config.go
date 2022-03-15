@@ -2,7 +2,7 @@ package config
 
 import "time"
 
-type ServerConfig struct {
+type serverConfig struct {
 	RedisConfigs              []RedisConf               `json:"redis_configs" form:"redis_configs" mapstructure:"redis_configs"`
 	MysqlConfigs              []MysqlConf               `json:"mysql_configs" form:"mysql_configs" mapstructure:"mysql_configs"`
 	PulsarMqConf              PulsarMqConf              `json:"pulsar_mq_conf" mapstructure:"pulsar_mq_conf"`

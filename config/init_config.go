@@ -1,20 +1,14 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
-var ServerConfigSettings = &ServerConfig{}
+var ServerConfigSettings = &serverConfig{}
 
 func InitConfig(path string, serverName string) {
-	flag.Parse()
-	flag.StringVar(&ServerConfigSettings.Server.ServerHost, "host", "0.0.0.0", "host 需要配置")
-	flag.IntVar(&ServerConfigSettings.Server.ServerPort, "port", 8080, "port 需要配置")
-	flag.StringVar(&ServerConfigSettings.Server.ServerName, "server_name", "", "server_name 需要配置")
-	flag.StringVar(&ServerConfigSettings.Server.Path, "path", "", "path 需要配置")
 	if ServerConfigSettings.Server.ServerName == "" {
 		ServerConfigSettings.Server.ServerName = serverName
 	}
@@ -45,7 +39,7 @@ func initServerConfigSettings() {
 
 }
 
-func (s *ServerConfig) InitServerConfigSettings() {
+func (s *serverConfig) InitServerConfigSettings() {
 	config := viper.New()
 	ServerConfigSettings = s
 	config.AddConfigPath(s.Server.Path)

@@ -3,12 +3,11 @@ package mq
 import (
 	"context"
 	"github.com/apache/pulsar-client-go/pulsar"
-	gin_const "github.com/fellowme/gin_common_library/const"
+	"github.com/panjf2000/ants/v2"
 	"go.uber.org/zap"
-	"time"
 )
 
-func ReceivePulsarMqMessage(pulsarOptions pulsar.ConsumerOptions, f func(message pulsar.Message), stopChan chan error) {
+func ReceivePulsarMqMessage(pulsarOptions pulsar.ConsumerOptions, f func(message pulsar.Message), stopChan chan error, pool *ants.Pool) {
 	consumer, err := getPulsarClient().Subscribe(pulsarOptions)
 	if err != nil {
 		zap.L().Error("ReceivePulsarMqMessage pulsarClient Subscribe error ", zap.Any("error", err))
@@ -25,13 +24,15 @@ func ReceivePulsarMqMessage(pulsarOptions pulsar.ConsumerOptions, f func(message
 		}
 		if msg != nil {
 			consumer.Ack(msg)
-			startTime := time.Now()
-			zap.L().Info("ReceivePulsarMqMessage pulsarClient start  ......... ", zap.Any("msg", msg),
-				zap.Any("start_time", startTime.Format(gin_const.TimeFormat)))
-			f(msg)
-			costTime := time.Now().Sub(startTime).Seconds()
-			zap.L().Info("ReceivePulsarMqMessage execute success  end ........", zap.Any("cost_time", costTime),
-				zap.Any("end_time", time.Now().Format(gin_const.TimeFormat)), zap.Any("msg", msg))
+			err := pool.Submit(func() {
+				zap.L().Info("ReceivePulsarMqMessage pulsarClient  pool Submit function", zap.Any("msg", string(msg.Payload())))
+				f(msg)
+			})
+			if err != nil {
+				zap.L().Error("ReceivePulsarMqMessage pulsarClient pool Submit error ", zap.Any("error", err))
+				stopChan <- err
+				break
+			}
 		}
 	}
 }
