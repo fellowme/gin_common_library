@@ -105,41 +105,80 @@ func GetBitmapKey(name, key string, offset int) (int, error) {
 	return result, err
 }
 
-// SetRedisLockKey  ****   设置分布式锁 name:redis名称 key:删除key lockName: 锁名字 time: 锁存在时间 返回 error *****//
-func SetRedisLockKey(name, key, lockName string, time int) error {
+// SetRedisLockKey  ****   设置分布式锁 name:redis名称 key:值 lockName: 锁名字 time: 锁存在时间 返回 error *****//
+func SetRedisLockKey(key, lockName string, time int, name ...string) (bool, error) {
 	newKey := createKey(key)
-	selectRedis := UseRedis(name).Get()
+	selectRedis := UseRedis(name...).Get()
 	luaExpire := redis.NewScript(1, ScriptLock)
-	_, err := redis.Int(luaExpire.Do(selectRedis, lockName, newKey, time))
+	flag, err := redis.Bool(luaExpire.Do(selectRedis, lockName, newKey, time))
 	if err != nil {
-		zap.L().Error("luaExpire fail", zap.String("key", key), zap.Any("error", err), zap.String("name", name))
+		zap.L().Error("SetRedisLockKey ScriptLock fail", zap.Any("error", err), zap.Any("name", name))
 	}
 	defer closeRedisConnect(selectRedis)
-	return err
+	return flag, err
 }
 
 // DeleteRedisLockKey  ****   删除分布式锁 name:redis名称 key:删除key lockName: 锁名字 返回 int *****//
-func DeleteRedisLockKey(name, key, lockName string) error {
+func DeleteRedisLockKey(key, lockName string, name ...string) (bool, error) {
 	newKey := createKey(key)
-	selectRedis := UseRedis(name).Get()
+	selectRedis := UseRedis(name...).Get()
 	luaDel := redis.NewScript(1, ScriptDelete)
-	_, err := redis.Int(luaDel.Do(selectRedis, lockName, newKey))
+	flag, err := redis.Bool(luaDel.Do(selectRedis, lockName, newKey))
 	if err != nil {
-		zap.L().Error("luaDel fail", zap.String("key", key), zap.Any("error", err), zap.String("name", name))
+		zap.L().Error("DeleteRedisLockKey luaDel fail", zap.String("key", key), zap.Any("error", err), zap.Any("name", name))
 	}
 	defer closeRedisConnect(selectRedis)
-	return err
+	return flag, err
 }
 
 // ResetExpireRedisLockKey  ****   续费分布式锁 name:redis名称 key:删除key lockName: 锁名字 返回 int *****//
-func ResetExpireRedisLockKey(name, key, lockName string, time int) error {
+func ResetExpireRedisLockKey(key, lockName string, time int, name ...string) (bool, error) {
 	newKey := createKey(key)
-	selectRedis := UseRedis(name).Get()
+	selectRedis := UseRedis(name...).Get()
 	luaExpire := redis.NewScript(1, ScriptExpire)
-	_, err := redis.Int(luaExpire.Do(selectRedis, lockName, newKey, time))
+	flag, err := redis.Bool(luaExpire.Do(selectRedis, lockName, newKey, time))
 	if err != nil {
-		zap.L().Error(" ResetExpireRedisLockKey luaExpire fail", zap.String("key", key), zap.Any("error", err), zap.String("name", name))
+		zap.L().Error(" ResetExpireRedisLockKey luaExpire fail", zap.String("key", key), zap.Any("error", err), zap.Any("name", name))
 	}
 	defer closeRedisConnect(selectRedis)
-	return err
+	return flag, err
+}
+
+// ScriptDecrbyKey  ****   redis 脚本减少库存  *****//
+func ScriptDecrbyKey(key string, number int, name ...string) (bool, error) {
+	newKey := createKey(key)
+	selectRedis := UseRedis(name...).Get()
+	luaScript := redis.NewScript(1, ScriptDecrby)
+	flag, err := redis.Bool(luaScript.Do(selectRedis, newKey, number))
+	if err != nil {
+		zap.L().Error(" ScriptDecrbyKey NewScript do fail", zap.String("key", key), zap.Any("error", err), zap.Any("flag", flag))
+	}
+	defer closeRedisConnect(selectRedis)
+	return flag, err
+}
+
+// ScriptIncrbyKey  ****   redis 脚本增加库存  *****//
+func ScriptIncrbyKey(key string, number int, name ...string) (bool, error) {
+	newKey := createKey(key)
+	selectRedis := UseRedis(name...).Get()
+	luaScript := redis.NewScript(1, ScriptIncrby)
+	flag, err := redis.Bool(luaScript.Do(selectRedis, newKey, number))
+	if err != nil {
+		zap.L().Error(" ScriptIncrbyKey NewScript do fail", zap.String("key", key), zap.Any("error", err), zap.Any("flag", flag))
+	}
+	defer closeRedisConnect(selectRedis)
+	return flag, err
+}
+
+// SendScrip  ****   redis 上传脚本 不执行 *****//
+func SendScrip(scriptString string, keyCount int, name ...string) (string, error) {
+	selectRedis := UseRedis(name...).Get()
+	luaExpire := redis.NewScript(keyCount, scriptString)
+	err := luaExpire.Load(selectRedis)
+	if err != nil {
+		zap.L().Error(" SendScrip NewScript fail", zap.String("scriptString", scriptString), zap.Any("error", err))
+	}
+	hashCode := luaExpire.Hash()
+	defer closeRedisConnect(selectRedis)
+	return hashCode, err
 }

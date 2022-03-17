@@ -57,16 +57,17 @@ func GetRedisConnect(redisConfig gin_config.RedisConf) func() (redis.Conn, error
 }
 
 // UseRedis 获取使用的redis
-func UseRedis(name string) *redis.Pool {
+func UseRedis(name ...string) *redis.Pool {
 	if len(redisMap) == 0 {
 		InitRedis()
 	}
-	if name == "" {
-		name = redisDefault
+	redisName := redisDefault
+	if len(name) != 0 {
+		redisName = name[0]
 	}
-	selectRedis, ok := redisMap[name]
+	selectRedis, ok := redisMap[redisName]
 	if !ok {
-		panic("无法获取 redis_" + name)
+		panic("无法获取 redis_" + redisName)
 	}
 	return selectRedis
 }
