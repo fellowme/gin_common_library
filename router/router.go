@@ -29,7 +29,7 @@ func RegisterRouter(routers gin.RoutesInfo, serverName string, mysqlDataBase ...
 			}
 			err := gin_mysql.UseMysql(nil, mysqlDataBase...).Table(gin_const.DefaultMenuTableName).
 				Where("is_delete = false and method = ? and path = ? and server_name = ?", router.Method,
-					router.Path, router.Handler).FirstOrCreate(&routerStruct).Error
+					router.Path, serverName).FirstOrCreate(&routerStruct).Error
 			if err != nil {
 				zap.L().Error("menu registerRouter error", zap.Any("error", err.Error),
 					zap.Any("router", router))
