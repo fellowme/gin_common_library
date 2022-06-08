@@ -55,13 +55,13 @@ func (l Logger) Trace(ctx context.Context, begin time.Time, fc func() (string, i
 	switch {
 	case err != nil && l.LogConfig.LogLevel >= gorm_logger.Error && (!l.LogConfig.IgnoreRecordNotFoundError || !errors.Is(err, gorm.ErrRecordNotFound)):
 		sql, rows := fc()
-		l.ZapLogger.Error("trace", zap.Error(err), zap.Duration("cost_time", costTime), zap.Int64("rows", rows), zap.String("sql", sql))
+		l.ZapLogger.Error("trace", zap.Error(err), zap.Float64("cost_time", costTime.Seconds()), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.LogConfig.SlowThreshold != 0 && costTime > l.LogConfig.SlowThreshold && l.LogConfig.LogLevel >= gorm_logger.Warn:
 		sql, rows := fc()
-		l.ZapLogger.Warn("trace", zap.Duration("cost_time", costTime), zap.Int64("rows", rows), zap.String("sql", sql))
+		l.ZapLogger.Warn("trace", zap.Float64("cost_time", costTime.Seconds()), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.LogConfig.LogLevel >= gorm_logger.Info:
 		sql, rows := fc()
-		l.ZapLogger.Info("trace", zap.Duration("cost_time", costTime), zap.Int64("rows", rows), zap.String("sql", sql))
+		l.ZapLogger.Info("trace", zap.Float64("cost_time", costTime.Seconds()), zap.Int64("rows", rows), zap.String("sql", sql))
 	}
 
 }

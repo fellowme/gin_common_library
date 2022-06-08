@@ -11,6 +11,7 @@ type serverConfig struct {
 	JaegerConfig              JaegerConfig              `json:"jaeger_config" form:"jaeger_config" mapstructure:"jaeger_config"`
 	ElasticConfig             ElasticConfig             `json:"elastic_config" form:"elastic_config" mapstructure:"elastic_config"`
 	AliYunSendPhoneCodeConfig AliYunSendPhoneCodeConfig `json:"ali_yun_send_phone_code_config" mapstructure:"ali_yun_send_phone_code_config"`
+	BigCacheConfig            BigCacheConfig            `json:"big_cache_config" mapstructure:"big_cache_config"`
 }
 
 type Server struct {
@@ -96,4 +97,11 @@ type PulsarMqConf struct {
 	ConnectionTimeout   time.Duration     `json:"connection_timeout" mapstructure:"connection_timeout"` // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
 	CustomMetricsLabels map[string]string `json:"custom_metrics_labels" mapstructure:"custom_metrics_labels"`
 	Timeout             time.Duration     `json:"timeout" mapstructure:"timeout"`
+}
+
+type BigCacheConfig struct {
+	Shards           int           `json:"shards,omitempty" mapstructure:"shards"`
+	LifeWindow       time.Duration `json:"life_window,omitempty" mapstructure:"life_window"`
+	HardMaxCacheSize int           `json:"hard_max_cache_size" mapstructure:"hard_max_cache_size" `
+	CleanWindow      time.Duration `json:"clean_window" mapstructure:"clean_window"`
 }

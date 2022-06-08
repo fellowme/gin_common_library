@@ -7,6 +7,7 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi v0.1.14
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.8
 	github.com/alibabacloud-go/tea v1.1.17
+	github.com/allegro/bigcache/v3 v3.0.2
 	github.com/apache/pulsar-client-go v0.8.0
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6

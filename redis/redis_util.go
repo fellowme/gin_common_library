@@ -22,10 +22,21 @@ func createKey(key string) string {
 	return strings.Join([]string{redisPrefix, key}, redisCharacterMark)
 }
 
-// GetKeyByte ****   获取name:redis名称 key:查询的key  返回 interface{} *****//
-func GetKeyByte(name, key string) (interface{}, error) {
+// GetKey ****   获取name:redis名称 key:查询的key  返回 interface{} *****//
+func GetKey(name, key string) (interface{}, error) {
 	newKey := createKey(key)
 	result, err := commandRedisWithRetry(name, "GET", newKey)
+	return result, err
+}
+
+// MGetKey ****   获取name:redis名称 keys:查询的key  返回 interface{} *****//
+func MGetKey(name string, keys []string) (interface{}, error) {
+	keyList := make([]interface{}, 0)
+	for _, key := range keys {
+		keyList = append(keyList, createKey(key))
+	}
+
+	result, err := commandRedisWithRetry(name, "MGET", keyList...)
 	return result, err
 }
 
@@ -181,4 +192,43 @@ func SendScrip(scriptString string, keyCount int, name ...string) (string, error
 	hashCode := luaExpire.Hash()
 	defer closeRedisConnect(selectRedis)
 	return hashCode, err
+}
+
+// HSetMapKey 设置map值
+func HSetMapKey(name, mapKey, key, value string) (err error) {
+	newKey := createKey(mapKey)
+	_, err = commandRedisWithRetry(name, "HSET", newKey, key, value)
+	return
+}
+
+// HMSetMapKey 设置map值
+func HMSetMapKey(name, mapKey string, args []interface{}) (err error) {
+	newKey := createKey(mapKey)
+	_, err = commandRedisWithRetry(name, "HMSET", append([]interface{}{
+		newKey,
+	}, args...)...)
+	return
+}
+
+// HMGetMapKey 设置map值
+func HMGetMapKey(name, mapKey string, args []interface{}) (data []string, err error) {
+	newKey := createKey(mapKey)
+	data, err = redis.Strings(commandRedisWithRetry(name, "HMGET", append([]interface{}{
+		newKey,
+	}, args...)...))
+	return
+}
+
+// HGetMapKey 获取map值
+func HGetMapKey(name, mapKey, key string) (value string, err error) {
+	newKey := createKey(mapKey)
+	value, err = redis.String(commandRedisWithRetry(name, "HGET", newKey, key))
+	return
+}
+
+// HDelMapKey 获取map值
+func HDelMapKey(name, mapKey, key string) (err error) {
+	newKey := createKey(mapKey)
+	_, err = commandRedisWithRetry(name, "HDEL", newKey, key)
+	return
 }
