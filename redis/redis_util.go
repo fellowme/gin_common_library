@@ -35,9 +35,22 @@ func MGetKey(name string, keys []string) (interface{}, error) {
 	for _, key := range keys {
 		keyList = append(keyList, createKey(key))
 	}
-
 	result, err := commandRedisWithRetry(name, "MGET", keyList...)
 	return result, err
+}
+
+// MSetKey ****   设置name:redis名称 keys:设置的key value  返回 error *****//
+func MSetKey(name string, keys []string) error {
+	keyList := make([]interface{}, 0)
+	for index, key := range keys {
+		if index%2 == 0 {
+			keyList = append(keyList, createKey(key))
+		} else {
+			keyList = append(keyList, key)
+		}
+	}
+	_, err := commandRedisWithRetry(name, "MSET", keyList...)
+	return err
 }
 
 // SetKeyValue  ****   设置name:redis名称 key:查询的key value:设定的值 expire:存在时间  返回 error *****//
