@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/fellowme/gin_common_library/big_cache"
 	gin_config "github.com/fellowme/gin_common_library/config"
+	gin_consul "github.com/fellowme/gin_common_library/consul"
 	gin_es "github.com/fellowme/gin_common_library/elastic"
 	gin_jaeger "github.com/fellowme/gin_common_library/jaeger"
 	gin_logger "github.com/fellowme/gin_common_library/logger"
@@ -12,7 +13,6 @@ import (
 	gin_translator "github.com/fellowme/gin_common_library/translator"
 	gin_util "github.com/fellowme/gin_common_library/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 /*
@@ -30,6 +30,7 @@ func initCommonExtend(configPath string, serverName string) {
 	gin_pulsar.InitPulsarClient()
 	gin_es.InitElastic()
 	big_cache.NewBigCache()
+	gin_consul.InitConsulClient()
 }
 
 /*
@@ -50,7 +51,7 @@ func initRouter(app *gin.Engine, f func(group *gin.RouterGroup)) {
 	// 测活
 	api := app.Group("/api/v1")
 	api.HEAD("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "success")
+		c.JSON(200, nil)
 	})
 	if f != nil {
 		f(api)

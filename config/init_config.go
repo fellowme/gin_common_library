@@ -29,13 +29,13 @@ func initServerConfigSettings() {
 	if err := config.Unmarshal(ServerConfigSettings); err != nil {
 		panic(err)
 	}
-	config.WatchConfig()
-	config.OnConfigChange(func(in fsnotify.Event) {
-		fmt.Printf("配置文件已经修改了 %s", in.String())
-		if err := config.Unmarshal(ServerConfigSettings); err != nil {
-			panic(err)
-		}
-	})
+	//config.WatchConfig()
+	//config.OnConfigChange(func(in fsnotify.Event) {
+	//	fmt.Printf("配置文件已经修改了 %s", in.String())
+	//	if err := config.Unmarshal(ServerConfigSettings); err != nil {
+	//		panic(err)
+	//	}
+	//})
 
 }
 

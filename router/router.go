@@ -14,6 +14,9 @@ import (
 	RegisterRouter 将router 注册到 menu
 */
 func RegisterRouter(routers gin.RoutesInfo, serverName string, mysqlDataBase ...string) {
+	if gin_mysql.UseMysql(nil, mysqlDataBase...) == nil {
+		return
+	}
 	err := gin_mysql.UseMysql(nil, mysqlDataBase...).Table(gin_const.DefaultMenuTableName).
 		Where("server_name = ?", serverName).Delete(&MenuStructParam{}).Error
 	if err != nil {

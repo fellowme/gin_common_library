@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
+	grpc_consul "github.com/fellowme/gin_common_library/consul"
 	gin_jaeger "github.com/fellowme/gin_common_library/jaeger"
 	gin_logger "github.com/fellowme/gin_common_library/logger"
 	gin_mysql "github.com/fellowme/gin_common_library/mysql"
@@ -25,7 +26,7 @@ func creatApp(configPath, serverName string) *gin.Engine {
 	return app
 }
 
-func CreateAppServer(configPath, serverName string, f func(group *gin.RouterGroup), models []interface{}) {
+func CreateAppServer(configPath, serverName string, f func(group *gin.RouterGroup), models []interface{}, consul grpc_consul.ServiceConsul) {
 	// 执行配置
 	initCommonExtend(configPath, serverName)
 	// 是否执行 debug 模式
@@ -46,10 +47,14 @@ func CreateAppServer(configPath, serverName string, f func(group *gin.RouterGrou
 	endless.DefaultMaxHeaderBytes = 1 << 20
 	endPoint := fmt.Sprintf("%s:%d", gin_config.ServerConfigSettings.Server.ServerHost,
 		gin_config.ServerConfigSettings.Server.ServerPort)
-	defer deferClose()
+	defer func() {
+		deferClose()
+		grpc_consul.UnRegisterConsul(consul.Id)
+	}()
 	server := endless.NewServer(endPoint, app)
 	server.BeforeBegin = func(add string) {
 		zap.L().Info(fmt.Sprintf("Actual pid is %d", syscall.Getpid()))
+		grpc_consul.RegisterWebConsul(consul)
 	}
 	if err := server.ListenAndServe(); err != nil {
 		panic(fmt.Sprint("init server fail err=", err))
@@ -66,4 +71,12 @@ func initTable(models []interface{}) {
 			zap.L().Error("UseMysql error", zap.Any("error", err))
 		}
 	}
+}
+
+func preSigUsr1() {
+	zap.L().Info("pre SIGUSR1")
+}
+
+func postSigUsr1() {
+	zap.L().Info("post SIGUSR1")
 }

@@ -12,6 +12,8 @@ type serverConfig struct {
 	ElasticConfig             ElasticConfig             `json:"elastic_config" form:"elastic_config" mapstructure:"elastic_config"`
 	AliYunSendPhoneCodeConfig AliYunSendPhoneCodeConfig `json:"ali_yun_send_phone_code_config" mapstructure:"ali_yun_send_phone_code_config"`
 	BigCacheConfig            BigCacheConfig            `json:"big_cache_config" mapstructure:"big_cache_config"`
+	EtcdConfig                EtcdConfig                `json:"etcd_config" mapstructure:"etcd_config"`
+	ConsulConfig              ConsulConfig              `json:"consul_config" mapstructure:"consul_config"`
 }
 
 type Server struct {
@@ -105,3 +107,15 @@ type BigCacheConfig struct {
 	HardMaxCacheSize int           `json:"hard_max_cache_size" mapstructure:"hard_max_cache_size" `
 	CleanWindow      time.Duration `json:"clean_window" mapstructure:"clean_window"`
 }
+
+type (
+	EtcdConfig struct {
+		EtcdAddress     string        `json:"etcd_address" mapstructure:"etcd_address"`
+		EtcdDialTimeout time.Duration `json:"etcd_dial_timeout" mapstructure:"etcd_dial_timeout"`
+	}
+	ConsulConfig struct {
+		ConsulAddress string        `json:"consul_address" mapstructure:"consul_address"`
+		TimeOut       time.Duration `json:"time_out" mapstructure:"time_out"`
+		IntervalTime  time.Duration `json:"interval_time" mapstructure:"interval_time"`
+	}
+)
