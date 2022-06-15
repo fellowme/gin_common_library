@@ -36,6 +36,9 @@ func CreateAppMqServer(configPath, serverName string, f func(), consul grpc_cons
 	initRouter(app, nil)
 	//  执行 方法
 	f()
+	if consul.Id != "" {
+		consul.Id = fmt.Sprintf("%s-version-%d", consul.Name, time.Now().Unix())
+	}
 	//  endless 启动
 	endless.DefaultReadTimeOut = time.Duration(gin_config.ServerConfigSettings.Server.ReadTimeout) * time.Second
 	endless.DefaultWriteTimeOut = time.Duration(gin_config.ServerConfigSettings.Server.WriteTimeout) * time.Second

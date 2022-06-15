@@ -19,6 +19,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func InitRpcServer(configPath, serverName string) *grpc.Server {
@@ -30,9 +31,9 @@ func InitRpcServer(configPath, serverName string) *grpc.Server {
 			grpc_ctxtags.UnaryServerInterceptor(),
 			grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithFilterFunc(func(ctx context.Context, fullMethodName string) bool {
 				if fullMethodName == "/grpc.health.v1.Health/Check" {
-					return true
+					return false
 				}
-				return false
+				return true
 			})),
 			grpc_zap.UnaryServerInterceptor(zap.L()),
 			gin_middleware.UnaryServerInterceptor(),
@@ -48,6 +49,9 @@ func CreateRpcServer(gRpcService *grpc.Server, consul grpc_consul.ServiceConsul)
 	}()
 	errChan := make(chan error)
 	stopChan := make(chan os.Signal)
+	if consul.Id != "" {
+		consul.Id = fmt.Sprintf("%s-version-%d", consul.Name, time.Now().Unix())
+	}
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
 	go func() {
 		grpc_health_v1.RegisterHealthServer(gRpcService, &service_health.HealthService{})
