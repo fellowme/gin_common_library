@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
+	grpc_consul "github.com/fellowme/gin_common_library/consul"
 	gin_logger "github.com/fellowme/gin_common_library/logger"
 	"github.com/fvbock/endless"
 	"github.com/gin-contrib/cors"
@@ -22,7 +23,7 @@ func creatMqApp(configPath, serverName string) *gin.Engine {
 	return app
 }
 
-func CreateAppMqServer(configPath, serverName string, f func()) {
+func CreateAppMqServer(configPath, serverName string, f func(), consul grpc_consul.ServiceConsul) {
 	// 执行配置
 	initCommonExtend(configPath, serverName)
 	// 是否执行 debug 模式
@@ -41,10 +42,14 @@ func CreateAppMqServer(configPath, serverName string, f func()) {
 	endless.DefaultMaxHeaderBytes = 1 << 20
 	endPoint := fmt.Sprintf("%s:%d", gin_config.ServerConfigSettings.Server.ServerHost,
 		gin_config.ServerConfigSettings.Server.ServerMqPort)
-	defer deferClose()
+	defer func() {
+		grpc_consul.UnRegisterConsul(consul.Id)
+		deferClose()
+	}()
 	server := endless.NewServer(endPoint, app)
 	server.BeforeBegin = func(add string) {
 		zap.L().Info(fmt.Sprintf("Actual pid is %d", syscall.Getpid()))
+		grpc_consul.RegisterWebConsul(consul)
 	}
 	if err := server.ListenAndServe(); err != nil {
 		panic(fmt.Sprint("init server fail err=", err))

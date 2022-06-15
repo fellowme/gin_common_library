@@ -53,48 +53,47 @@ func IoCloser() {
 func TracerJaegerMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//  head 请求放过
-		if strings.ToLower(c.Request.Method) == gin_util.RequestHeadMethod || strings.ToLower(c.Request.Method) == gin_util.RequestOptionMethod {
-			c.Next()
+		if strings.ToLower(c.Request.Method) != gin_util.RequestHeadMethod && strings.ToLower(c.Request.Method) != gin_util.RequestOptionMethod {
+			var parentSpan opentracing.Span
+			var bodyBytes []byte
+			if c.Request.Body != nil {
+				// 复制 request.body
+				bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
+				c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+			}
+			spCtx, err := opentracing.GlobalTracer().Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(c.Request.Header))
+			if err != nil {
+				parentSpan = tracer.StartSpan(c.Request.URL.Path,
+					opentracing.Tags{
+						"method":              c.Request.Method,
+						"url":                 c.Request.URL,
+						"data":                string(bodyBytes),
+						"header":              c.Request.Header,
+						string(ext.Component): c.Request.Proto,
+						"serverName":          gin_config.ServerConfigSettings.Server.ServerName,
+					},
+					ext.SpanKindRPCServer)
+				defer parentSpan.Finish()
+			} else {
+				parentSpan = opentracing.StartSpan(
+					c.Request.URL.Path,
+					opentracing.ChildOf(spCtx),
+					opentracing.Tags{
+						"method":              c.Request.Method,
+						"url":                 c.Request.URL,
+						"data":                string(bodyBytes),
+						"header":              c.Request.Header,
+						string(ext.Component): c.Request.Proto,
+						"serverName":          gin_config.ServerConfigSettings.Server.ServerName,
+					},
+					ext.SpanKindRPCServer,
+				)
+				defer parentSpan.Finish()
+			}
+			// 兼容 rpc
+			ctx := opentracing.ContextWithSpan(context.Background(), parentSpan)
+			c.Set("tracerContext", ctx)
 		}
-		var parentSpan opentracing.Span
-		var bodyBytes []byte
-		if c.Request.Body != nil {
-			// 复制 request.body
-			bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
-			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-		}
-		spCtx, err := opentracing.GlobalTracer().Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(c.Request.Header))
-		if err != nil {
-			parentSpan = tracer.StartSpan(c.Request.URL.Path,
-				opentracing.Tags{
-					"method":              c.Request.Method,
-					"url":                 c.Request.URL,
-					"data":                string(bodyBytes),
-					"header":              c.Request.Header,
-					string(ext.Component): c.Request.Proto,
-					"serverName":          gin_config.ServerConfigSettings.Server.ServerName,
-				},
-				ext.SpanKindRPCServer)
-			defer parentSpan.Finish()
-		} else {
-			parentSpan = opentracing.StartSpan(
-				c.Request.URL.Path,
-				opentracing.ChildOf(spCtx),
-				opentracing.Tags{
-					"method":              c.Request.Method,
-					"url":                 c.Request.URL,
-					"data":                string(bodyBytes),
-					"header":              c.Request.Header,
-					string(ext.Component): c.Request.Proto,
-					"serverName":          gin_config.ServerConfigSettings.Server.ServerName,
-				},
-				ext.SpanKindRPCServer,
-			)
-			defer parentSpan.Finish()
-		}
-		// 兼容 rpc
-		ctx := opentracing.ContextWithSpan(context.Background(), parentSpan)
-		c.Set("tracerContext", ctx)
 		c.Next()
 	}
 }

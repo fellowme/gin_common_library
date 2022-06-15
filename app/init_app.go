@@ -52,6 +52,9 @@ func CreateAppServer(configPath, serverName string, f func(group *gin.RouterGrou
 		grpc_consul.UnRegisterConsul(consul.Id)
 	}()
 	server := endless.NewServer(endPoint, app)
+	if consul.Id != "" {
+		consul.Id = fmt.Sprintf("%s-version-%d", consul.Name, time.Now().Unix())
+	}
 	server.BeforeBegin = func(add string) {
 		zap.L().Info(fmt.Sprintf("Actual pid is %d", syscall.Getpid()))
 		grpc_consul.RegisterWebConsul(consul)
@@ -71,12 +74,4 @@ func initTable(models []interface{}) {
 			zap.L().Error("UseMysql error", zap.Any("error", err))
 		}
 	}
-}
-
-func preSigUsr1() {
-	zap.L().Info("pre SIGUSR1")
-}
-
-func postSigUsr1() {
-	zap.L().Info("post SIGUSR1")
 }
