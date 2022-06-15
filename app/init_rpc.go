@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
 	grpc_consul "github.com/fellowme/gin_common_library/consul"
@@ -27,7 +28,12 @@ func InitRpcServer(configPath, serverName string) *grpc.Server {
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_recovery.UnaryServerInterceptor(),
 			grpc_ctxtags.UnaryServerInterceptor(),
-			grpc_opentracing.UnaryServerInterceptor(),
+			grpc_opentracing.UnaryServerInterceptor(grpc_opentracing.WithFilterFunc(func(ctx context.Context, fullMethodName string) bool {
+				if fullMethodName == "/grpc.health.v1.Health/Check" {
+					return true
+				}
+				return false
+			})),
 			grpc_zap.UnaryServerInterceptor(zap.L()),
 			gin_middleware.UnaryServerInterceptor(),
 		)))

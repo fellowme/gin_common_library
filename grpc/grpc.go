@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer/roundrobin"
-	"google.golang.org/grpc/resolver"
 )
 
 // CloseGRPCConnect  关闭链接
@@ -25,7 +24,6 @@ func CloseGRPCConnect(conn *grpc.ClientConn) {
 func GetGRPCConnect(ctx context.Context, target string) *grpc.ClientConn {
 	//r := gin_etcd.NewResolver(zap.L())
 	r := gin_consul.NewResolver(target, zap.L())
-	resolver.Register(r)
 	conn, err := grpc.DialContext(ctx, target, grpc.WithChainUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 		grpc_zap.UnaryClientInterceptor(zap.L()),
 		grpc_opentracing.UnaryClientInterceptor(),

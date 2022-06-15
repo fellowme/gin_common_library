@@ -6,10 +6,9 @@ import (
 	consul "github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/resolver"
-	"time"
 )
 
-func discoveryServices(serviceName string, q *consul.QueryOptions) ([]consul.AgentServiceChecksInfo, error) {
+func DiscoveryServices(serviceName string, q *consul.QueryOptions) ([]consul.AgentServiceChecksInfo, error) {
 	if clientAgent == nil {
 		zap.L().Error("DiscoveryService consul yaml error ")
 		return nil, errors.New(consulYamlError)
@@ -26,7 +25,6 @@ type Resolver struct {
 	serviceAddressList []resolver.Address
 	cc                 resolver.ClientConn
 	logger             *zap.Logger
-	lastTime           time.Time
 }
 
 // NewResolver create a new resolver.Builder base on etcd
@@ -63,17 +61,16 @@ func (r *Resolver) start() (chan<- struct{}, error) {
 	r.agent = clientAgent
 	resolver.Register(r)
 	r.closeCh = make(chan struct{})
-	if time.Now().Sub(r.lastTime).Seconds() >= 5.0 {
-		err := r.sync()
-		if err != nil {
-			return r.closeCh, err
-		}
+	err := r.sync()
+	if err != nil {
+		return r.closeCh, err
 	}
 	return r.closeCh, nil
 }
 
 // sync 同步获取所有地址信息
 func (r *Resolver) sync() error {
+	zap.L().Info("starting consul 。。。。")
 	_, res, err := r.agent.AgentHealthServiceByName(r.serviceName)
 	if err != nil {
 		return err
@@ -84,6 +81,6 @@ func (r *Resolver) sync() error {
 		r.serviceAddressList = append(r.serviceAddressList, addr)
 	}
 	r.cc.UpdateState(resolver.State{Addresses: r.serviceAddressList})
-	r.lastTime = time.Now()
+	zap.L().Info("ending consul 。。。。")
 	return nil
 }
