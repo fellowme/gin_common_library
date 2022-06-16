@@ -18,7 +18,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/gomodule/redigo v1.8.5
+	github.com/gomodule/redigo v1.8.8
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/consul/api v1.13.0
 	github.com/olivere/elastic/v7 v7.0.29
