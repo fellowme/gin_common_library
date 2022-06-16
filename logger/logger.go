@@ -59,7 +59,7 @@ func initLogger(loggerConfig gin_config.LoggerConfig, serverName string) *zap.Lo
 	filed := zap.Fields(zap.String("serviceName", serverName))
 	// 构造日志
 	ZapLogger := zap.New(core, caller, development, filed)
-	ZapLogger.Info("zap_log 初始化成功")
+	ZapLogger.Info("zap_log init success")
 	//zap.ReplaceGlobals(ZapLogger)
 	return ZapLogger
 }

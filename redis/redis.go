@@ -1,9 +1,12 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	gin_config "github.com/fellowme/gin_common_library/config"
 	"github.com/gomodule/redigo/redis"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	"go.uber.org/zap"
 	"time"
 )
@@ -15,7 +18,9 @@ func InitRedis() {
 		redisMap = make(map[string]*redis.Pool, len(gin_config.ServerConfigSettings.RedisConfigs))
 		for _, redisConfig := range gin_config.ServerConfigSettings.RedisConfigs {
 			redisPool := &redis.Pool{
-				Dial:        GetRedisConnect(redisConfig),
+				DialContext: func(ctx context.Context) (redis.Conn, error) {
+					return GetRedisConnect(ctx, redisConfig)
+				},
 				MaxIdle:     redisConfig.MaxIdle,
 				MaxActive:   redisConfig.MaxActive,
 				IdleTimeout: redisConfig.IdleTimeout * time.Second,
@@ -26,8 +31,8 @@ func InitRedis() {
 	}
 }
 
-func GetRedisConnect(redisConfig gin_config.RedisConf) func() (redis.Conn, error) {
-	client, err := redis.Dial(tcpConnect, fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port),
+func GetRedisConnect(ctx context.Context, redisConfig gin_config.RedisConf) (redis.Conn, error) {
+	client, err := redis.DialContext(ctx, tcpConnect, fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port),
 		redis.DialConnectTimeout(redisConfig.ConnectTimeout*time.Second), redis.DialReadTimeout(redisConfig.ReadTimeout*time.Second),
 		redis.DialWriteTimeout(redisConfig.ReadWriteTimeout*time.Second))
 	if err != nil {
@@ -37,23 +42,17 @@ func GetRedisConnect(redisConfig gin_config.RedisConf) func() (redis.Conn, error
 		if _, err = client.Do("AUTH", redisConfig.Password); err != nil {
 			closeRedisConnect(client)
 			zap.L().Error("ERROR: fail Password redis pool", zap.Any("error", err))
-			return func() (redis.Conn, error) {
-				return nil, err
-			}
+			return nil, err
 		}
 	}
 	if redisConfig.Database > 0 {
 		if _, err = client.Do("SELECT", redisConfig.Database); err != nil {
 			zap.L().Error("ERROR: fail SELECT redis pool", zap.Any("error", err))
 			closeRedisConnect(client)
-			return func() (redis.Conn, error) {
-				return nil, err
-			}
+			return nil, err
 		}
 	}
-	return func() (redis.Conn, error) {
-		return client, err
-	}
+	return client, err
 }
 
 // UseRedis 获取使用的redis
@@ -67,15 +66,15 @@ func UseRedis(name ...string) *redis.Pool {
 	}
 	selectRedis, ok := redisMap[redisName]
 	if !ok {
-		panic("无法获取 redis_" + redisName)
+		panic("not find redis_" + redisName)
 	}
 	return selectRedis
 }
 
 // redis 重试2次  间隔 10ms
-func commandRedisWithRetry(name, commandName string, args ...interface{}) (reply interface{}, err error) {
+func commandRedisWithRetry(ctx context.Context, name, commandName string, args ...interface{}) (reply interface{}, err error) {
 	for i := 0; i < retryCount; i++ {
-		reply, err = commandRedis(name, commandName, args...)
+		reply, err = commandRedis(ctx, name, commandName, args...)
 		if err == nil {
 			return
 		}
@@ -85,20 +84,42 @@ func commandRedisWithRetry(name, commandName string, args ...interface{}) (reply
 }
 
 // 执行redis command 命令
-func commandRedis(name, commandName string, args ...interface{}) (reply interface{}, err error) {
-	selectRedis := UseRedis(name).Get()
+func commandRedis(ctx context.Context, name, commandName string, args ...interface{}) (reply interface{}, err error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	selectRedis, err := UseRedis(name).GetContext(ctx)
+	defer closeRedisConnect(selectRedis)
+	if err != nil {
+		zap.L().Error("commandRedis GetContext error", zap.Any("error", err),
+			zap.String("commandName", commandName), zap.Any("args", args))
+		return
+	}
 	nowTime := time.Now()
 	reply, err = selectRedis.Do(commandName, args...)
 	costTime := time.Since(nowTime)
 	if err != nil {
-		zap.L().Error("redis do fail", zap.Any("error", err), zap.Duration("costTime", costTime),
+		zap.L().Error("redis do error", zap.Any("error", err), zap.Duration("costTime", costTime),
 			zap.String("commandName", commandName), zap.Any("args", args))
 	} else {
 		zap.L().Info("redis do success", zap.Duration("costTime", costTime),
 			zap.String("commandName", commandName), zap.Any("args", args))
-
 	}
-	defer closeRedisConnect(selectRedis)
+	parentSpan := opentracing.SpanFromContext(ctx)
+	if parentSpan != nil {
+		span := opentracing.StartSpan(
+			"redis_action_trace",
+			opentracing.ChildOf(parentSpan.Context()),
+			opentracing.Tags{
+				"cost_time":   costTime.Seconds(),
+				"commandName": commandName,
+				"args":        args,
+				"error":       err,
+			},
+			ext.SpanKindProducer,
+		)
+		defer span.Finish()
+	}
 	return
 }
 

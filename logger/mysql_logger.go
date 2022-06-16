@@ -3,6 +3,8 @@ package logger
 import (
 	"context"
 	"errors"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	"time"
 
 	"go.uber.org/zap"
@@ -52,16 +54,28 @@ func (l Logger) Trace(ctx context.Context, begin time.Time, fc func() (string, i
 		return
 	}
 	costTime := time.Since(begin)
+	sql, rows := fc()
 	switch {
 	case err != nil && l.LogConfig.LogLevel >= gorm_logger.Error && (!l.LogConfig.IgnoreRecordNotFoundError || !errors.Is(err, gorm.ErrRecordNotFound)):
-		sql, rows := fc()
 		l.ZapLogger.Error("trace", zap.Error(err), zap.Float64("cost_time", costTime.Seconds()), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.LogConfig.SlowThreshold != 0 && costTime > l.LogConfig.SlowThreshold && l.LogConfig.LogLevel >= gorm_logger.Warn:
-		sql, rows := fc()
 		l.ZapLogger.Warn("trace", zap.Float64("cost_time", costTime.Seconds()), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.LogConfig.LogLevel >= gorm_logger.Info:
-		sql, rows := fc()
 		l.ZapLogger.Info("trace", zap.Float64("cost_time", costTime.Seconds()), zap.Int64("rows", rows), zap.String("sql", sql))
+	}
+	parentSpan := opentracing.SpanFromContext(ctx)
+	if parentSpan != nil {
+		span := opentracing.StartSpan(
+			"gorm_action_trace",
+			opentracing.ChildOf(parentSpan.Context()),
+			opentracing.Tags{
+				"cost_time": costTime.Seconds(),
+				"rows":      rows,
+				"sql":       sql,
+			},
+			ext.SpanKindProducer,
+		)
+		defer span.Finish()
 	}
 
 }
