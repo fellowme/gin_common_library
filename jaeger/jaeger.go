@@ -53,8 +53,8 @@ func IoCloser() {
 func TracerJaegerMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//  head 请求放过
+		var parentSpan opentracing.Span
 		if strings.ToLower(c.Request.Method) != gin_util.RequestHeadMethod && strings.ToLower(c.Request.Method) != gin_util.RequestOptionMethod {
-			var parentSpan opentracing.Span
 			var bodyBytes []byte
 			if c.Request.Body != nil {
 				// 复制 request.body
@@ -95,5 +95,9 @@ func TracerJaegerMiddleWare() gin.HandlerFunc {
 			c.Set("tracerContext", ctx)
 		}
 		c.Next()
+		if parentSpan != nil {
+			parentSpan.SetTag("status_code", c.Writer.Status())
+			parentSpan.SetTag("error", c.Errors.String())
+		}
 	}
 }
